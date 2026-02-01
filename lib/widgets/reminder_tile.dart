@@ -6,12 +6,14 @@ class ReminderTile extends StatelessWidget {
   final Reminder reminder;
   final VoidCallback onDone;
   final VoidCallback onDelete;
+  final VoidCallback? onTap;
 
   const ReminderTile({
     super.key,
     required this.reminder,
     required this.onDone,
     required this.onDelete,
+    this.onTap,
   });
 
   String _formatDueDate(DateTime dueAt) {
@@ -94,20 +96,22 @@ class ReminderTile extends StatelessWidget {
           );
         }
       },
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Padding(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Padding(
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
@@ -160,6 +164,7 @@ class ReminderTile extends StatelessWidget {
               ),
             ],
           ),
+        ),
         ),
       ),
     );

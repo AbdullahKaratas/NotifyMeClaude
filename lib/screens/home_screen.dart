@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import '../models/reminder.dart';
 import '../services/supabase_service.dart';
 import '../services/notification_service.dart';
+import '../services/config_service.dart';
 import '../widgets/reminder_tile.dart';
+import 'reminder_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -26,10 +28,22 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _scheduleNotificationsForNewReminders(List<Reminder> reminders) {
     for (final reminder in reminders) {
-      if (!_scheduledNotifications.contains(reminder.id) &&
-          !reminder.isDone &&
-          reminder.dueAt.isAfter(DateTime.now())) {
-        NotificationService.scheduleReminder(reminder);
+      if (!_scheduledNotifications.contains(reminder.id) && !reminder.isDone) {
+        // If reminder is due within 30 seconds, show notification immediately
+        final now = DateTime.now();
+        final diff = reminder.dueAt.difference(now);
+
+        if (diff.inSeconds <= 30) {
+          // Show immediate notification for "now" reminders
+          NotificationService.showNow(
+            'Reminder',
+            reminder.title,
+          );
+        } else if (reminder.dueAt.isAfter(now)) {
+          // Schedule for future
+          NotificationService.scheduleReminder(reminder);
+        }
+
         _scheduledNotifications.add(reminder.id);
       }
     }
@@ -65,6 +79,96 @@ class _HomeScreenState extends State<HomeScreen> {
     _scheduledNotifications.remove(reminder.id);
   }
 
+  void _openDetail(Reminder reminder) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ReminderDetailScreen(
+          reminder: reminder,
+          onDone: () => _markAsDone(reminder),
+          onDelete: () => _deleteReminder(reminder),
+        ),
+      ),
+    );
+  }
+
+  void _showSettings(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Einstellungen',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              ListTile(
+                leading: const Icon(Icons.storage_outlined),
+                title: const Text('Supabase URL'),
+                subtitle: Text(
+                  ConfigService.supabaseUrl ?? 'Nicht konfiguriert',
+                  style: const TextStyle(fontSize: 12),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const Divider(),
+              ListTile(
+                leading: const Icon(Icons.logout, color: Colors.red),
+                title: const Text('Konfiguration zurücksetzen'),
+                subtitle: const Text('Verbindung trennen und neu einrichten'),
+                onTap: () async {
+                  Navigator.pop(context);
+                  final confirm = await showDialog<bool>(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('Zurücksetzen?'),
+                      content: const Text(
+                        'Die Supabase-Verbindung wird getrennt. Du musst die App neu konfigurieren.',
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, false),
+                          child: const Text('Abbrechen'),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, true),
+                          style: TextButton.styleFrom(foregroundColor: Colors.red),
+                          child: const Text('Zurücksetzen'),
+                        ),
+                      ],
+                    ),
+                  );
+                  if (confirm == true && mounted) {
+                    await ConfigService.clearConfig();
+                    // Restart app - user needs to reconfigure
+                    if (mounted) {
+                      Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
+                    }
+                  }
+                },
+              ),
+              const SizedBox(height: 16),
+              Center(
+                child: Text(
+                  'NotifyMe v1.0.0 • Powered by Claude',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,6 +178,12 @@ class _HomeScreenState extends State<HomeScreen> {
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings_outlined),
+            onPressed: () => _showSettings(context),
+          ),
+        ],
       ),
       body: StreamBuilder<List<Reminder>>(
         stream: SupabaseService.watchReminders(),
@@ -115,6 +225,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   reminder: reminder,
                   onDone: () => _markAsDone(reminder),
                   onDelete: () => _deleteReminder(reminder),
+                  onTap: () => _openDetail(reminder),
                 );
               },
             ),

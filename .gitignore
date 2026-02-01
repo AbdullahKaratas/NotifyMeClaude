@@ -40,5 +40,8 @@ android/**/GeneratedPluginRegistrant.java
 # Coverage
 coverage/
 
+# MCP config
+.mcp.json
+
 # Pubspec lock (optional - remove this line if you want to commit it)
 # pubspec.lock

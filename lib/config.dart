@@ -4,11 +4,6 @@
 /// Get these from: https://supabase.com/dashboard/project/YOUR_PROJECT/settings/api
 
 class AppConfig {
-  // TODO: Replace with your Supabase URL
-  // Example: https://abcdefghijklmnop.supabase.co
-  static const String supabaseUrl = 'YOUR_SUPABASE_URL';
-
-  // TODO: Replace with your Supabase anon key
-  // This is the public key, safe to include in the app
-  static const String supabaseAnonKey = 'YOUR_SUPABASE_ANON_KEY';
+  static const String supabaseUrl = 'https://zeisrosiohbnasvinlmp.supabase.co';
+  static const String supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InplaXNyb3Npb2hibmFzdmlubG1wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk1MTg2NTEsImV4cCI6MjA4NTA5NDY1MX0.viQcx3dO9J9WWmnnH4gt4_S0DzXNbeRBENy5Es5jOIw';
 }

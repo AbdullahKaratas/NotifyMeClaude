@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz_data;
@@ -13,8 +14,17 @@ class NotificationService {
   static Future<void> init() async {
     if (_initialized) return;
 
-    // Initialize timezone
+    // Initialize timezone data
     tz_data.initializeTimeZones();
+
+    // Set local timezone based on system
+    try {
+      final String timeZoneName = await _getLocalTimezoneName();
+      tz.setLocalLocation(tz.getLocation(timeZoneName));
+    } catch (e) {
+      // Fallback to Europe/Berlin for German locale
+      tz.setLocalLocation(tz.getLocation('Europe/Berlin'));
+    }
 
     // iOS settings
     const darwinSettings = DarwinInitializationSettings(
@@ -117,5 +127,52 @@ class NotificationService {
         await scheduleReminder(reminder);
       }
     }
+  }
+
+  /// Get local timezone name from system
+  static Future<String> _getLocalTimezoneName() async {
+    // On most systems, we can read the timezone from the environment or system
+    final now = DateTime.now();
+    final offset = now.timeZoneOffset;
+
+    // Map common offsets to timezone names
+    // This is a simplified approach - for production, use flutter_timezone package
+    if (offset.inHours == 1) {
+      return 'Europe/Berlin'; // CET
+    } else if (offset.inHours == 2) {
+      return 'Europe/Berlin'; // CEST (summer time)
+    } else if (offset.inHours == 0) {
+      return 'Europe/London';
+    } else if (offset.inHours == -5) {
+      return 'America/New_York';
+    } else if (offset.inHours == -8) {
+      return 'America/Los_Angeles';
+    }
+
+    // Default fallback
+    return 'Europe/Berlin';
+  }
+
+  /// Show an immediate notification (for testing)
+  static Future<void> showNow(String title, String body) async {
+    await _notifications.show(
+      DateTime.now().millisecondsSinceEpoch ~/ 1000,
+      title,
+      body,
+      const NotificationDetails(
+        iOS: DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+        ),
+        android: AndroidNotificationDetails(
+          'reminders',
+          'Reminders',
+          channelDescription: 'Reminder notifications',
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
+      ),
+    );
   }
 }

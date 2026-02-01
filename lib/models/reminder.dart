@@ -2,6 +2,7 @@ class Reminder {
   final String id;
   final String title;
   final String? description;
+  final String? imageUrl;
   final DateTime dueAt;
   final DateTime createdAt;
   final bool isDone;
@@ -10,6 +11,7 @@ class Reminder {
     required this.id,
     required this.title,
     this.description,
+    this.imageUrl,
     required this.dueAt,
     required this.createdAt,
     this.isDone = false,
@@ -20,6 +22,7 @@ class Reminder {
       id: json['id'] as String,
       title: json['title'] as String,
       description: json['description'] as String?,
+      imageUrl: json['image_url'] as String?,
       dueAt: DateTime.parse(json['due_at'] as String),
       createdAt: DateTime.parse(json['created_at'] as String),
       isDone: json['is_done'] as bool? ?? false,
@@ -31,6 +34,7 @@ class Reminder {
       'id': id,
       'title': title,
       'description': description,
+      'image_url': imageUrl,
       'due_at': dueAt.toIso8601String(),
       'created_at': createdAt.toIso8601String(),
       'is_done': isDone,
@@ -41,6 +45,7 @@ class Reminder {
     String? id,
     String? title,
     String? description,
+    String? imageUrl,
     DateTime? dueAt,
     DateTime? createdAt,
     bool? isDone,
@@ -49,6 +54,7 @@ class Reminder {
       id: id ?? this.id,
       title: title ?? this.title,
       description: description ?? this.description,
+      imageUrl: imageUrl ?? this.imageUrl,
       dueAt: dueAt ?? this.dueAt,
       createdAt: createdAt ?? this.createdAt,
       isDone: isDone ?? this.isDone,
