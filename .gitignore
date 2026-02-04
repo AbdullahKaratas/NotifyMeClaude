@@ -43,5 +43,9 @@ coverage/
 # MCP config
 .mcp.json
 
+# Environment secrets
+.env
+telegram_config.json
+
 # Pubspec lock (optional - remove this line if you want to commit it)
 # pubspec.lock
