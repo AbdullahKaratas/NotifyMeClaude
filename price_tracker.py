@@ -58,6 +58,105 @@ ALERT_RULES = {
     },
 }
 
+# ── AI Trading Context (updated per analysis session) ──
+# Last updated: 04.02.2026
+TRADING_ZONES = {
+    'SI=F': {
+        'bias': 'NEUTRAL',
+        'context': 'Crash von $117 auf $78 am 30.01. durch Warsh Fed-Nominierung + COMEX Margin 15%. Erholung läuft. ATR extrem hoch (13%).',
+        'zones': [
+            {'type': 'SELL', 'price': 92, 'dir': 'above',
+             'note': 'Widerstand! Heutiges Hoch $92.02. Spike-and-Fade Muster. SHORT nur mit KO >$95.'},
+            {'type': 'SELL', 'price': 95, 'dir': 'above',
+             'note': 'Starker Widerstand. Wenn durchbrochen, Squeeze möglich Richtung $100.'},
+            {'type': 'WATCH', 'price': 85, 'dir': 'below',
+             'note': 'Unter $85 wird es wieder bearish. Nächster Support $82 (Tagestief 04.02.).'},
+            {'type': 'BUY', 'price': 82, 'dir': 'below',
+             'note': 'Kaufzone! Tagestief 04.02. Strukturelles Angebotsdefizit stützt mittelfristig.'},
+            {'type': 'BUY', 'price': 80, 'dir': 'below',
+             'note': 'Starke Kaufzone. Crash-Tief $78 nah. Solarindustrie-Nachfrage als Boden.'},
+        ],
+    },
+    'AAPL': {
+        'bias': 'LONG',
+        'context': 'Position offen: 213x Turbo HT7817, KO $233.78. Aktuell +37% im Plus.',
+        'zones': [
+            {'type': 'SELL', 'price': 290, 'dir': 'above',
+             'note': 'Gewinnmitnahme erwägen! +50% auf Turbo wäre hier erreicht.'},
+            {'type': 'SELL', 'price': 300, 'dir': 'above',
+             'note': 'Psychologische Marke. Starker Widerstand, Teilverkauf sinnvoll.'},
+            {'type': 'STOP', 'price': 260, 'dir': 'below',
+             'note': 'Achtung! Turbo-Gewinn schmilzt. Stop-Loss überprüfen.'},
+            {'type': 'DANGER', 'price': 250, 'dir': 'below',
+             'note': 'GEFAHR! Nur noch 7% über KO ($233.78). Sofort absichern oder raus.'},
+        ],
+    },
+    'QBTS': {
+        'bias': 'WATCH',
+        'context': 'Position geschlossen mit -97 EUR. Quantum-Hype volatil. Nur mit klarem Setup wieder rein.',
+        'zones': [
+            {'type': 'BUY', 'price': 15, 'dir': 'below',
+             'note': 'Kaufzone für Swing-Trade. Aber nur kleine Position, max 100 EUR.'},
+            {'type': 'WATCH', 'price': 18, 'dir': 'below',
+             'note': 'Unter $18 wird es interessant. Abwarten auf Bodenbildung.'},
+            {'type': 'SELL', 'price': 25, 'dir': 'above',
+             'note': 'Wenn Long: Gewinne mitnehmen. Quantum-Aktien übertreiben in beide Richtungen.'},
+            {'type': 'SELL', 'price': 30, 'dir': 'above',
+             'note': 'Starker Widerstand. Hier wird regelmäßig abverkauft.'},
+        ],
+    },
+    'WDC': {
+        'bias': 'BUY_WATCH',
+        'context': 'Earnings-Crash -11%. NAND/HDD-Nachfrage intakt. Kaufzone nähert sich.',
+        'zones': [
+            {'type': 'BUY', 'price': 255, 'dir': 'below',
+             'note': 'Kaufzone beginnt! Earnings-Überreaktion. KGV jetzt ~8x, historisch günstig.'},
+            {'type': 'BUY', 'price': 240, 'dir': 'below',
+             'note': 'Starke Kaufzone! Support-Level. Position aufbauen mit Stop $225.'},
+            {'type': 'BUY', 'price': 230, 'dir': 'below',
+             'note': 'Aggressive Kaufzone. Wenn das nicht hält, stimmt was Fundamentales nicht.'},
+            {'type': 'SELL', 'price': 290, 'dir': 'above',
+             'note': 'Erholung komplett. Gewinne sichern, Widerstand von vor Earnings.'},
+            {'type': 'SELL', 'price': 296, 'dir': 'above',
+             'note': 'Pre-Earnings Hoch. Hier raus wenn Long.'},
+        ],
+    },
+}
+
+
+def get_zone_context(sym, price_level, direction):
+    """Get AI trading context for a price level."""
+    if sym not in TRADING_ZONES:
+        return None
+    for zone in TRADING_ZONES[sym]['zones']:
+        if zone['price'] == price_level and zone['dir'] == direction:
+            type_emoji = {'BUY': '🟢', 'SELL': '🔴', 'WATCH': '👀', 'STOP': '⚠️', 'DANGER': '🔥'}.get(zone['type'], '')
+            return f'{type_emoji} {zone["note"]}'
+    return None
+
+
+def get_zone_status(sym, price):
+    """Get current zone status for a symbol in hourly summary."""
+    if sym not in TRADING_ZONES:
+        return ''
+    zones = TRADING_ZONES[sym]
+    nearest = None
+    nearest_dist = float('inf')
+    for zone in zones['zones']:
+        dist = abs(price - zone['price'])
+        if dist < nearest_dist:
+            nearest_dist = dist
+            nearest = zone
+    if not nearest:
+        return ''
+    pct_away = ((nearest['price'] - price) / price) * 100
+    if abs(pct_away) < 1:
+        return f' ⬅️ {nearest["type"]} Zone!'
+    elif abs(pct_away) < 5:
+        return f' ({abs(pct_away):.1f}% bis {nearest["type"]} ${nearest["price"]})'
+    return ''
+
+
 prev_prices = {}
 alerted_levels = set()
 last_summary_hour = -1
@@ -144,21 +243,23 @@ def check_alerts(prices):
                 if price >= lvl and key not in alerted_levels:
                     alerted_levels.add(key)
                     alerted_levels.discard(f'{sym}_below_{lvl}')
-                    alerts.append({
-                        'text': (f'🚨 <b>{meta["emoji"]} {meta["name"]} ÜBER ${lvl}!</b>\n'
-                                 f'Aktuell: ${price:.2f} ({change:+.1f}%)'),
-                        'silent': False,
-                    })
+                    zone_note = get_zone_context(sym, lvl, 'above')
+                    text = f'🚨 <b>{meta["emoji"]} {meta["name"]} ÜBER ${lvl}!</b>\n'
+                    text += f'Aktuell: ${price:.2f} ({change:+.1f}%)'
+                    if zone_note:
+                        text += f'\n\n🤖 <i>{zone_note}</i>'
+                    alerts.append({'text': text, 'silent': False})
             for lvl in levels.get('below', []):
                 key = f'{sym}_below_{lvl}'
                 if price <= lvl and key not in alerted_levels:
                     alerted_levels.add(key)
                     alerted_levels.discard(f'{sym}_above_{lvl}')
-                    alerts.append({
-                        'text': (f'🚨 <b>{meta["emoji"]} {meta["name"]} UNTER ${lvl}!</b>\n'
-                                 f'Aktuell: ${price:.2f} ({change:+.1f}%)'),
-                        'silent': False,
-                    })
+                    zone_note = get_zone_context(sym, lvl, 'below')
+                    text = f'🚨 <b>{meta["emoji"]} {meta["name"]} UNTER ${lvl}!</b>\n'
+                    text += f'Aktuell: ${price:.2f} ({change:+.1f}%)'
+                    if zone_note:
+                        text += f'\n\n🤖 <i>{zone_note}</i>'
+                    alerts.append({'text': text, 'silent': False})
 
         threshold = ALERT_RULES['big_daily_move_pct']
         for t in [threshold, threshold * 2, threshold * 3]:
@@ -195,7 +296,8 @@ def format_summary(prices):
             if abs(move) > 0.1:
                 move_txt = f' ({"↑" if move > 0 else "↓"}{abs(move):.1f}%/5m)'
 
-        lines.append(f'{arrow} {meta["emoji"]} <b>{meta["name"]}</b>: ${price:.2f} ({change:+.1f}%){move_txt}')
+        zone_txt = get_zone_status(sym, price)
+        lines.append(f'{arrow} {meta["emoji"]} <b>{meta["name"]}</b>: ${price:.2f} ({change:+.1f}%){move_txt}{zone_txt}')
 
     return '\n'.join(lines)
 
