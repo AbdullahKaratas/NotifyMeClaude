@@ -34,6 +34,7 @@ SYMBOLS = {
     'AAPL': {'name': 'Apple', 'emoji': '🍎'},
     'QBTS': {'name': 'D-Wave', 'emoji': '⚛️'},
     'WDC':  {'name': 'Western Digital', 'emoji': '💾'},
+    'GOOGL': {'name': 'Alphabet', 'emoji': '🔍'},
 }
 
 # ── Alert Thresholds ──
@@ -54,41 +55,47 @@ ALERT_RULES = {
     },
     'WDC': {
         'above': [290, 296, 310],
-        'below': [255, 250, 240, 230],
+        'below': [270, 255, 240, 230, 215],
+    },
+    'GOOGL': {
+        'above': [339, 345, 349, 360],
+        'below': [328, 320, 310, 300],
     },
 }
 
 # ── AI Trading Context (updated per analysis session) ──
-# Last updated: 04.02.2026
+# Last updated: 05.02.2026
 TRADING_ZONES = {
     'SI=F': {
-        'bias': 'NEUTRAL',
-        'context': 'Crash von $117 auf $78 am 30.01. durch Warsh Fed-Nominierung + COMEX Margin 15%. Erholung läuft. ATR extrem hoch (13%).',
+        'bias': 'LONG',
+        'context': 'Crash von $117 auf $78 am 30.01. Recovery auf $87. Signal LONG 58%. Entscheidungszone $87-92. Updated 05.02.2026.',
         'zones': [
             {'type': 'SELL', 'price': 92, 'dir': 'above',
-             'note': 'Widerstand! Heutiges Hoch $92.02. Spike-and-Fade Muster. SHORT nur mit KO >$95.'},
-            {'type': 'SELL', 'price': 95, 'dir': 'above',
-             'note': 'Starker Widerstand. Wenn durchbrochen, Squeeze möglich Richtung $100.'},
+             'note': 'Kurzfristiger Widerstand! Hoch vom 04.02 ($92.02). Teilgewinne mitnehmen.'},
+            {'type': 'SELL', 'price': 100, 'dir': 'above',
+             'note': 'Pre-Crash Konsolidierung + 62% Fib-Retracement. Psychologische Marke. Gewinne sichern.'},
             {'type': 'WATCH', 'price': 85, 'dir': 'below',
-             'note': 'Unter $85 wird es wieder bearish. Nächster Support $82 (Tagestief 04.02.).'},
+             'note': 'Unter $85 = bearish. Pivot $83 MUSS halten fuer Recovery-Case.'},
             {'type': 'BUY', 'price': 82, 'dir': 'below',
-             'note': 'Kaufzone! Tagestief 04.02. Strukturelles Angebotsdefizit stützt mittelfristig.'},
+             'note': 'Kaufzone! Tagestief 04.02. Gestaffelter Einstieg. Strukturelles Angebotsdefizit stuetzt.'},
             {'type': 'BUY', 'price': 80, 'dir': 'below',
              'note': 'Starke Kaufzone. Crash-Tief $78 nah. Solarindustrie-Nachfrage als Boden.'},
+            {'type': 'DANGER', 'price': 79, 'dir': 'below',
+             'note': 'GEFAHR! Unter Crash-Tief $78. Zweite Abwaertswelle. Alle Positionen schliessen.'},
         ],
     },
     'AAPL': {
         'bias': 'LONG',
-        'context': 'Position offen: 213x Turbo HT7817, KO $233.78. Aktuell +37% im Plus.',
+        'context': 'Position offen: 213x Turbo HT7817, KO $233.78. +37% im Plus. Q1 Rekord: $143.8B Rev (+16%), EPS $2.84 (+19%). Signal LONG 72%. Updated 05.02.2026.',
         'zones': [
             {'type': 'SELL', 'price': 290, 'dir': 'above',
-             'note': 'Gewinnmitnahme erwägen! +50% auf Turbo wäre hier erreicht.'},
+             'note': 'ATH-Zone! 52W-Hoch $288.62. 50% Gewinn mitnehmen, Rest mit Stop $270 laufen lassen.'},
             {'type': 'SELL', 'price': 300, 'dir': 'above',
-             'note': 'Psychologische Marke. Starker Widerstand, Teilverkauf sinnvoll.'},
-            {'type': 'STOP', 'price': 260, 'dir': 'below',
-             'note': 'Achtung! Turbo-Gewinn schmilzt. Stop-Loss überprüfen.'},
+             'note': 'Psychologische Marke + Analyst Cluster. Starker Widerstand, Teilverkauf sinnvoll.'},
+            {'type': 'WATCH', 'price': 260, 'dir': 'below',
+             'note': 'Unter SMA 50 ($268)! Turbo-Gewinn schmilzt. 50% Position schliessen wenn Schlusskurs unter $260.'},
             {'type': 'DANGER', 'price': 250, 'dir': 'below',
-             'note': 'GEFAHR! Nur noch 7% über KO ($233.78). Sofort absichern oder raus.'},
+             'note': 'GEFAHR! Nur noch 7% ueber KO ($233.78). Unter Januar-Tief $248. Sofort absichern oder raus.'},
         ],
     },
     'QBTS': {
@@ -106,19 +113,41 @@ TRADING_ZONES = {
         ],
     },
     'WDC': {
-        'bias': 'BUY_WATCH',
-        'context': 'Earnings-Crash -11%. NAND/HDD-Nachfrage intakt. Kaufzone nähert sich.',
+        'bias': 'HOLD_BUY_ON_DIP',
+        'context': 'Post-Earnings -7.2% trotz Q2 Beat. AI-Storage Story intakt, +900% in 12Mo = Mean-Reversion-Risiko. Gestaffelter Entry bei Korrektur.',
         'zones': [
             {'type': 'BUY', 'price': 255, 'dir': 'below',
-             'note': 'Kaufzone beginnt! Earnings-Überreaktion. KGV jetzt ~8x, historisch günstig.'},
+             'note': 'Erste Kaufzone! Tief-Retest vom 04.02. ($254). Position 25% aufbauen. KO moderat $215.'},
             {'type': 'BUY', 'price': 240, 'dir': 'below',
-             'note': 'Starke Kaufzone! Support-Level. Position aufbauen mit Stop $225.'},
+             'note': 'Starke Kaufzone! Januar-Support $240-243. Position 50% aufbauen. Stop $215.'},
             {'type': 'BUY', 'price': 230, 'dir': 'below',
-             'note': 'Aggressive Kaufzone. Wenn das nicht hält, stimmt was Fundamentales nicht.'},
+             'note': 'Aggressive Kaufzone! Letzter starker Support. Position 25%. Wenn das bricht, raus.'},
+            {'type': 'WATCH', 'price': 270, 'dir': 'below',
+             'note': 'Unter Schlusskurs 04.02. Korrektur setzt sich fort. Abwarten auf tiefere Levels.'},
             {'type': 'SELL', 'price': 290, 'dir': 'above',
-             'note': 'Erholung komplett. Gewinne sichern, Widerstand von vor Earnings.'},
+             'note': 'Previous Close Widerstand. Wenn Long: Teilgewinne sichern.'},
             {'type': 'SELL', 'price': 296, 'dir': 'above',
-             'note': 'Pre-Earnings Hoch. Hier raus wenn Long.'},
+             'note': '52W-Hoch/ATH! Starker Widerstand. Komplett raus wenn Long.'},
+            {'type': 'DANGER', 'price': 215, 'dir': 'below',
+             'note': 'GEFAHR! Unter $215 = These invalidiert. Alle Positionen schliessen.'},
+        ],
+    },
+    'GOOGL': {
+        'bias': 'LONG_ON_DIP',
+        'context': 'Q4 Earnings Beat (EPS +7.2%, Rev +2.2%). CapEx $180B schockt Markt. Cloud +48%. AH -7%->-2%. Entry bei Ruecksetzer auf $315-325. Signal LONG 62%. Updated 05.02.2026.',
+        'zones': [
+            {'type': 'BUY', 'price': 320, 'dir': 'below',
+             'note': 'SMA 50 Support! Optimale Kaufzone. Turbo LONG mit KO $305. Cloud +48% + EPS Beat stuetzen.'},
+            {'type': 'BUY', 'price': 310, 'dir': 'below',
+             'note': 'Starke Kaufzone! Unter SMA50. Aggressiv kaufen mit KO $285 (konservativ).'},
+            {'type': 'WATCH', 'price': 328, 'dir': 'below',
+             'note': 'Unter Earnings-Day-Tief. Korrektur beschleunigt sich. Naechster Halt SMA50 $320.'},
+            {'type': 'SELL', 'price': 339, 'dir': 'above',
+             'note': 'Previous Close zurueckerobert! Wenn Long: Teilgewinne. Widerstand beachten.'},
+            {'type': 'SELL', 'price': 349, 'dir': 'above',
+             'note': 'ATH/52W-Hoch! Starker Widerstand. Double-Top-Gefahr. Gewinne sichern.'},
+            {'type': 'DANGER', 'price': 300, 'dir': 'below',
+             'note': 'GEFAHR! Psychologische Marke + Dezember-Gap. Unter $300 = Antitrust-Panik moeglich.'},
         ],
     },
 }
