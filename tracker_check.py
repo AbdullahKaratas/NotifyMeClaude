@@ -25,6 +25,8 @@ SYMBOLS = {
     'RKLB': {'name': 'Rocket Lab', 'emoji': '🚀'},
     'VST':  {'name': 'Vistra Energy', 'emoji': '⚡'},
     'GC=F': {'name': 'Gold', 'emoji': '🥇'},
+    'IREN': {'name': 'IREN', 'emoji': '🔥'},
+    'ARM':  {'name': 'ARM Holdings', 'emoji': '🧠'},
 }
 
 ALERT_RULES = {
@@ -61,6 +63,14 @@ ALERT_RULES = {
     'GC=F': {
         'above': [5000, 5376, 5586, 6000],
         'below': [4505, 4400, 4100, 3800],
+    },
+    'IREN': {
+        'above': [47, 55, 65, 76.87],
+        'below': [35, 32, 25, 18],
+    },
+    'ARM': {
+        'above': [119, 138, 150, 161],
+        'below': [100, 87, 80],
     },
 }
 
@@ -215,6 +225,50 @@ TRADING_ZONES = {
              'note': 'JPM/DB Targetzone. Feiern und Gewinne mitnehmen!'},
             {'type': 'DANGER', 'price': 3800, 'dir': 'below',
              'note': 'GEFAHR! Unter 200-SMA. Bull-Markt gebrochen. Alles raus.'},
+        ],
+    },
+    'IREN': {
+        'bias': 'HOLD',
+        'context': 'Microsoft $9.7B Deal. GPU-Skalierung 23k->140k. Aber -$957M FCF, 16.2% Short Float. Heute -12.3% am Earnings-Tag. Signal HOLD 52%. Nur spekulativ. Updated 05.02.2026.',
+        'zones': [
+            {'type': 'BUY', 'price': 35, 'dir': 'below',
+             'note': 'Erste Kaufzone! Nahe SMA 200 ($32). Kleine spekulative Position max 50 EUR.'},
+            {'type': 'BUY', 'price': 32, 'dir': 'below',
+             'note': 'SMA 200 Test! Wenn haelt = starkes Signal. Position aufbauen.'},
+            {'type': 'BUY', 'price': 25, 'dir': 'below',
+             'note': 'September-Konsolidierung. Aggressive Kaufzone. KO $18.'},
+            {'type': 'WATCH', 'price': 47, 'dir': 'above',
+             'note': 'SMA 50 zurueckerobert! Trendwende-Signal. Erst dann groessere Position.'},
+            {'type': 'SELL', 'price': 55, 'dir': 'above',
+             'note': 'November-Widerstand. Teilgewinne sichern bei +40% vom Tief.'},
+            {'type': 'SELL', 'price': 65, 'dir': 'above',
+             'note': 'Dezember-Hoch. 50% Position schliessen.'},
+            {'type': 'SELL', 'price': 76.87, 'dir': 'above',
+             'note': 'ATH! Komplett raus oder enger Stop. Short Squeeze moeglich.'},
+            {'type': 'DANGER', 'price': 18, 'dir': 'below',
+             'note': 'GEFAHR! Unter August-Support. These komplett invalidiert.'},
+        ],
+    },
+    'ARM': {
+        'bias': 'LONG',
+        'context': 'Monopol Chip-Architektur. Q3 Rev +26%, Earnings +120%. MACD Crossover bullisch. $3.3B Cash. Death Cross noch aktiv. Signal LONG 65%. Updated 05.02.2026.',
+        'zones': [
+            {'type': 'BUY', 'price': 100, 'dir': 'below',
+             'note': 'Psychologische Marke! Heute getestet und gehalten. Erste Position aufbauen.'},
+            {'type': 'BUY', 'price': 87, 'dir': 'below',
+             'note': 'Starke Kaufzone! Mai-2025-Tief. Aggressiv kaufen. KO $72.'},
+            {'type': 'BUY', 'price': 80, 'dir': 'below',
+             'note': '52W-Tief! Letzte Verteidigung. All-in wenn Fundamentals stimmen.'},
+            {'type': 'WATCH', 'price': 119, 'dir': 'above',
+             'note': 'SMA 50 zurueckerobert! Wichtiges technisches Signal. Death Cross Heilung beginnt.'},
+            {'type': 'SELL', 'price': 138, 'dir': 'above',
+             'note': 'SMA 200! Hauptwiderstand. Teilgewinne sichern.'},
+            {'type': 'SELL', 'price': 150, 'dir': 'above',
+             'note': 'Analyst Mean Target. 50% Position schliessen.'},
+            {'type': 'SELL', 'price': 161, 'dir': 'above',
+             'note': 'Juli-2025-Hoch. Starker Widerstand. Gewinne sichern.'},
+            {'type': 'DANGER', 'price': 72, 'dir': 'below',
+             'note': 'GEFAHR! Unter 52W-Tief. Neuer Abwaertstrend. Alles raus.'},
         ],
     },
 }
