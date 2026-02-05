@@ -27,6 +27,7 @@ SYMBOLS = {
     'GC=F': {'name': 'Gold', 'emoji': '🥇'},
     'IREN': {'name': 'IREN', 'emoji': '🔥'},
     'ARM':  {'name': 'ARM Holdings', 'emoji': '🧠'},
+    'ENR.DE': {'name': 'Siemens Energy', 'emoji': '🏭'},
 }
 
 ALERT_RULES = {
@@ -71,6 +72,10 @@ ALERT_RULES = {
     'ARM': {
         'above': [119, 138, 150, 161],
         'below': [100, 87, 80],
+    },
+    'ENR.DE': {
+        'above': [150, 156.70, 165, 175],
+        'below': [138, 126, 115, 102],
     },
 }
 
@@ -269,6 +274,28 @@ TRADING_ZONES = {
              'note': 'Juli-2025-Hoch. Starker Widerstand. Gewinne sichern.'},
             {'type': 'DANGER', 'price': 72, 'dir': 'below',
              'note': 'GEFAHR! Unter 52W-Tief. Neuer Abwaertstrend. Alles raus.'},
+        ],
+    },
+    'ENR.DE': {
+        'bias': 'SHORT',
+        'context': 'P/E 91x bei 3.6% Margin = Blase. 42.5% ueber SMA200. Analyst Mean EUR 143 UNTER Kurs. Double Top EUR 156. Gamesa Milliardenverluste. Signal SHORT 60%. Updated 05.02.2026.',
+        'zones': [
+            {'type': 'SELL', 'price': 150, 'dir': 'above',
+             'note': 'SHORT Entry! Widerstand. Position eroeffnen mit KO EUR 175.'},
+            {'type': 'SELL', 'price': 156.70, 'dir': 'above',
+             'note': 'ATH Retest! Maximaler SHORT Entry. Wenn durchbricht = Stop.'},
+            {'type': 'DANGER', 'price': 165, 'dir': 'above',
+             'note': 'GEFAHR! Neues ATH. SHORT-These geschwächt. Position reduzieren.'},
+            {'type': 'DANGER', 'price': 175, 'dir': 'above',
+             'note': 'KRITISCH! Weit ueber ATH. SHORT sofort schliessen.'},
+            {'type': 'BUY', 'price': 138, 'dir': 'below',
+             'note': 'SHORT Teilgewinne! -5% vom ATH. 25% Position schliessen.'},
+            {'type': 'BUY', 'price': 126, 'dir': 'below',
+             'note': 'SHORT Ziel 1: SMA 50. 50% Position schliessen.'},
+            {'type': 'BUY', 'price': 115, 'dir': 'below',
+             'note': 'SHORT Ziel 2: November-Support. 75% schliessen.'},
+            {'type': 'BUY', 'price': 102, 'dir': 'below',
+             'note': 'SHORT Jackpot! SMA 200. Komplett raus und feiern.'},
         ],
     },
 }
