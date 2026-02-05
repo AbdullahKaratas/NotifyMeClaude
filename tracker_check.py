@@ -22,6 +22,7 @@ SYMBOLS = {
     'QBTS': {'name': 'D-Wave', 'emoji': '⚛️'},
     'WDC':  {'name': 'Western Digital', 'emoji': '💾'},
     'GOOGL': {'name': 'Alphabet', 'emoji': '🔍'},
+    'RKLB': {'name': 'Rocket Lab', 'emoji': '🚀'},
 }
 
 ALERT_RULES = {
@@ -46,6 +47,10 @@ ALERT_RULES = {
     'GOOGL': {
         'above': [339, 345, 349, 360],
         'below': [328, 320, 310, 300],
+    },
+    'RKLB': {
+        'above': [75, 88, 99.58, 105],
+        'below': [65, 55, 48],
     },
 }
 
@@ -134,6 +139,28 @@ TRADING_ZONES = {
              'note': 'ATH/52W-Hoch! Starker Widerstand. Double-Top-Gefahr. Gewinne sichern.'},
             {'type': 'DANGER', 'price': 300, 'dir': 'below',
              'note': 'GEFAHR! Psychologische Marke + Dezember-Gap. Unter $300 = Antitrust-Panik moeglich.'},
+        ],
+    },
+    'RKLB': {
+        'bias': 'HOLD',
+        'context': 'Neutron-Rakete + Space Systems wachsen stark. Post-Earnings Korrektur (-7.9%) nach ATH $99.58. Signal HOLD 58%. SHORT-Bias bei Bruch unter $65. Updated 05.02.2026.',
+        'zones': [
+            {'type': 'BUY', 'price': 65, 'dir': 'below',
+             'note': 'Erste Kaufzone! SMA 50 nahe $69.61. Gestaffelter Einstieg. Space-Story langfristig intakt.'},
+            {'type': 'BUY', 'price': 55, 'dir': 'below',
+             'note': 'Starke Kaufzone! Januar-Support. Position aufbauen. KO $48 fuer Turbo.'},
+            {'type': 'BUY', 'price': 48, 'dir': 'below',
+             'note': 'Aggressive Kaufzone! Dezember-Tief. Letzter starker Support vor Gap.'},
+            {'type': 'WATCH', 'price': 73, 'dir': 'below',
+             'note': 'Unter Previous Close $73.11. Korrektur setzt sich fort. Abwarten.'},
+            {'type': 'SELL', 'price': 75, 'dir': 'above',
+             'note': 'Kurzfristiger Widerstand! Wenn Long: Teilgewinne sichern.'},
+            {'type': 'SELL', 'price': 88, 'dir': 'above',
+             'note': 'Starker Widerstand! Januar-Hoch. 50% Position schliessen.'},
+            {'type': 'SELL', 'price': 99.58, 'dir': 'above',
+             'note': 'ATH/52W-Hoch! Maximaler Widerstand. Komplett raus oder enger Stop.'},
+            {'type': 'DANGER', 'price': 48, 'dir': 'below',
+             'note': 'GEFAHR! Unter Dezember-Support. Grosse Korrektur moeglich. Positionen schliessen.'},
         ],
     },
 }
