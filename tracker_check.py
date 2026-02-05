@@ -387,7 +387,7 @@ def main():
         print(f'  ALERT SENT: {alert["text"][:60]}...')
 
     # Hourly summary
-    if hour != last_summary_hour and now.minute < 20:
+    if hour != last_summary_hour and now.minute < 35:
         msg = format_summary(prices, prev_prices)
         send_telegram(msg, silent=True)
         last_summary_hour = hour
