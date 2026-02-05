@@ -23,6 +23,8 @@ SYMBOLS = {
     'WDC':  {'name': 'Western Digital', 'emoji': '💾'},
     'GOOGL': {'name': 'Alphabet', 'emoji': '🔍'},
     'RKLB': {'name': 'Rocket Lab', 'emoji': '🚀'},
+    'VST':  {'name': 'Vistra Energy', 'emoji': '⚡'},
+    'GC=F': {'name': 'Gold', 'emoji': '🥇'},
 }
 
 ALERT_RULES = {
@@ -51,6 +53,14 @@ ALERT_RULES = {
     'RKLB': {
         'above': [75, 88, 99.58, 105],
         'below': [65, 55, 48],
+    },
+    'VST': {
+        'above': [150, 165, 179, 195],
+        'below': [138, 125, 110, 95],
+    },
+    'GC=F': {
+        'above': [5000, 5376, 5586, 6000],
+        'below': [4505, 4400, 4100, 3800],
     },
 }
 
@@ -161,6 +171,50 @@ TRADING_ZONES = {
              'note': 'ATH/52W-Hoch! Maximaler Widerstand. Komplett raus oder enger Stop.'},
             {'type': 'DANGER', 'price': 48, 'dir': 'below',
              'note': 'GEFAHR! Unter Dezember-Support. Grosse Korrektur moeglich. Positionen schliessen.'},
+        ],
+    },
+    'VST': {
+        'bias': 'LONG',
+        'context': 'Extrem ueberverkauft RSI 17.6. Death Cross aber Forward P/E 15x bei EBITDA-Guidance $6.8-7.6B. Q4 Earnings 26.02. Analyst Target $230. Signal LONG 62%. Updated 05.02.2026.',
+        'zones': [
+            {'type': 'BUY', 'price': 138, 'dir': 'below',
+             'note': 'Heutiges Tief! Erste Position 25%. RSI extrem ueberverkauft bei 17.6.'},
+            {'type': 'BUY', 'price': 125, 'dir': 'below',
+             'note': 'Starke Kaufzone! Position 50% aufbauen. KO moderat $110.'},
+            {'type': 'BUY', 'price': 110, 'dir': 'below',
+             'note': 'Aggressive Kaufzone! Oktober-2024 Konsolidierung. Letzter Support.'},
+            {'type': 'WATCH', 'price': 150, 'dir': 'above',
+             'note': 'Erster Widerstand. Bodenbildung bestaetigt wenn darueber schliesst.'},
+            {'type': 'SELL', 'price': 165, 'dir': 'above',
+             'note': 'SMA 50! Teilgewinne sichern. Starker Widerstand.'},
+            {'type': 'SELL', 'price': 179, 'dir': 'above',
+             'note': 'SMA 200! Hauptwiderstand. 50% Position schliessen.'},
+            {'type': 'SELL', 'price': 195, 'dir': 'above',
+             'note': '50% Fib-Retracement vom ATH. Zielzone Bull-Case.'},
+            {'type': 'DANGER', 'price': 95, 'dir': 'below',
+             'note': 'GEFAHR! Nahe 52W-Tief $90.51. These invalidiert. Alles raus.'},
+        ],
+    },
+    'GC=F': {
+        'bias': 'LONG',
+        'context': 'Sakularer Bull-Markt. Crash 30.01 durch Warsh-Nominierung (-12.3%). Golden Cross intakt. RSI bereinigt auf 56. JPM Target $6,300. Signal LONG 72%. Updated 05.02.2026.',
+        'zones': [
+            {'type': 'BUY', 'price': 4505, 'dir': 'below',
+             'note': 'SMA 50 Test! Optimale Kaufzone. Trend intakt solange SMA50 haelt.'},
+            {'type': 'BUY', 'price': 4400, 'dir': 'below',
+             'note': 'Crash-Tief Retest (02.02). Aggressiv kaufen. KO $3,800.'},
+            {'type': 'BUY', 'price': 4100, 'dir': 'below',
+             'note': 'Dezember-Support. Letzter starker Support vor 200-SMA.'},
+            {'type': 'WATCH', 'price': 5000, 'dir': 'above',
+             'note': 'Psychologische Marke. Erster Widerstand nach Recovery.'},
+            {'type': 'SELL', 'price': 5376, 'dir': 'above',
+             'note': 'Pre-Crash-High zurueck! Teilgewinne sichern.'},
+            {'type': 'SELL', 'price': 5586, 'dir': 'above',
+             'note': 'ATH! Starker Widerstand. Gewinne sichern.'},
+            {'type': 'SELL', 'price': 6000, 'dir': 'above',
+             'note': 'JPM/DB Targetzone. Feiern und Gewinne mitnehmen!'},
+            {'type': 'DANGER', 'price': 3800, 'dir': 'below',
+             'note': 'GEFAHR! Unter 200-SMA. Bull-Markt gebrochen. Alles raus.'},
         ],
     },
 }
