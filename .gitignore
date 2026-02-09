@@ -19,6 +19,5 @@ __pycache__/
 .env
 telegram_config.json
 
-# Personal tracker configs (use tracker_check_template.py to create your own)
-tracker_check.py
+# Personal local-only tracker (infinite loop version)
 price_tracker.py
