@@ -144,16 +144,16 @@ print(f'  Overall Risk:       {info.get("overallRisk", "N/A")}/10')
 
 ## 1.1 CHART GENERIEREN & ANALYSIEREN (PFLICHT!)
 
-**Führe diesen Befehl aus:**
+**Lies die Pfade aus `.env` und fuehre aus:**
 
 ```bash
-cd /Users/I516965/Documents/PRIVATE/trading-crew && source venv/bin/activate && python3 scripts/generate_chart.py {{SYMBOL}}
+source .env && $YFINANCE_VENV $CHART_SCRIPT {{SYMBOL}}
 ```
 
 **Dann lies den Chart:**
 
 ```
-Lies die Datei: /Users/I516965/Documents/PRIVATE/trading-crew/charts/{{SYMBOL}}_chart.png
+Lies die Datei: ${CHART_OUTPUT_DIR}/{{SYMBOL}}_chart.png
 ```
 
 ### CHART-INHALTE (4 Panels)
@@ -295,14 +295,35 @@ Suchquellen:
 
 ---
 
+## 1.10 KORRELATIONS-CHECK
+
+**Lies offene Positionen aus der Supabase `portfolio` Tabelle (status = 'open').**
+
+| Pruefpunkt | Ergebnis |
+|------------|----------|
+| Bestehende Positionen im gleichen Sektor | [Welche?] |
+| Sektor-Konzentration | [X% im gleichen Sektor] |
+| Richtungs-Korrelation | [Alle LONG? Alle Tech/AI?] |
+
+```
+⚠️ WARNUNG wenn:
+- > 60% des Portfolios im gleichen Sektor
+- > 3 Positionen gleiche Richtung + gleicher Sektor
+- Neuer Trade wuerde Klumpenrisiko erhoehen
+→ In der Analyse explizit erwaehnen!
+```
+
+---
+
 ## ENFORCEMENT
 
-- ✅ yfinance IMMER zuerst ausführen
+- ✅ yfinance IMMER zuerst ausfuehren
 - ✅ Chart generieren und visuell analysieren
 - ✅ Chart-Analyse-Tabelle ist PFLICHT
-- ✅ Keine Web-Suche für Preisdaten
+- ✅ Keine Web-Suche fuer Preisdaten
 - ✅ Jeder Datenpunkt mit Quelle
 - ✅ Mindestens 5 News-Headlines mit Datum
+- ✅ Korrelations-Check gegen bestehende Positionen
 
 ```
 ✅ [SCHRITT 1: DATENSAMMLUNG ABGESCHLOSSEN]

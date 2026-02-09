@@ -21,20 +21,12 @@
 ║  ATR:       X.X% ($XX.XX/Tag)                        ║
 ║                                                      ║
 ╠══════════════════════════════════════════════════════╣
-║  KNOCKOUT STRATEGIEN                                 ║
+║  KO & RISK                                           ║
 ╠══════════════════════════════════════════════════════╣
-║  Konservativ: $XX.XX (XX% | Xx ATR)                  ║
-║  Moderat:     $XX.XX (XX% | Xx ATR)                  ║
-║  Aggressiv:   $XX.XX (X%  | Xx ATR)                  ║
-║  Stop-Loss:   $XX.XX (mental, XX% ueber KO)          ║
-║                                                      ║
-╠══════════════════════════════════════════════════════╣
-║  POSITIONS-EMPFEHLUNG                                ║
-╠══════════════════════════════════════════════════════╣
-║  Lotto (50 EUR):     [JA/NEIN] - [Produkt + KO]     ║
-║  Klein (150 EUR):    [JA/NEIN] - [Produkt + KO]     ║
-║  Standard (300 EUR): [JA/NEIN] - [Produkt + KO]     ║
-║  Ohne Hebel (200 EUR): [JA/NEIN] - [ETF/ETC/Aktie]  ║
+║  KO-Level:    $XX.XX (XX.X% | Methode: ATR/Chart)   ║
+║  Stop-Loss:   $XX.XX (mental, ueber KO)              ║
+║  Hebel:       ~Xx                                    ║
+║  Max. Risiko: XXX EUR (XX% Portfolio)                ║
 ║                                                      ║
 ╠══════════════════════════════════════════════════════╣
 ║  SUPPORT              │  RESISTANCE                  ║
@@ -122,7 +114,7 @@ Die App hat Markdown-Support im Detail-Screen. Der User will die **VOLLSTÄNDIGE
 **KEINE KURZFASSUNG! Sende ALLE Schritte:**
 - ✅ Schritt 1: yfinance Live-Daten + Chart-Analyse + News + Fundamentals
 - ✅ Schritt 2: Investment Debate (Bull Runde 1+2, Bear Runde 1+2)
-- ✅ Schritt 3: Investment Judge + Trade-Plan (Entry/Exits/Stops/Watch Zones)
+- ✅ Schritt 3: Investment Judge + KO-Analyse (ATR+Chart) + Risk Check + Trade-Plan (Entry/Exits/Stops/Time-Stops/Watch Zones)
 - ✅ Schritt 4: Trading Card + Ausführliche Analyse
 
 ```sql
@@ -143,13 +135,36 @@ VALUES (
 
 ---
 
+## TELEGRAM VERSAND
+
+**Sende die Trading Card als Telegram-Nachricht:**
+
+```bash
+source .env && python3 send_telegram.py "$(cat <<'EOF'
+[TRADING CARD TEXT HIER EINFUEGEN]
+EOF
+)"
+```
+
+**Wenn ein Chart vorhanden ist, auch als Foto senden:**
+
+```bash
+source .env && python3 -c "
+from send_telegram import send_photo
+send_photo('${CHART_OUTPUT_DIR}/{{SYMBOL}}_chart.png', '{{SYMBOL}} Analyse')
+"
+```
+
+---
+
 ## ENFORCEMENT
 
 - ✅ Trading Card mit allen Key-Facts
-- ✅ Minimum 500 Wörter in der Analyse
+- ✅ Minimum 500 Woerter in der Analyse
 - ✅ ALLE vorherigen Schritte in der Description
 - ✅ Chart-URL in image_url
-- ✅ SQL INSERT ausführen
+- ✅ SQL INSERT ausfuehren
+- ✅ Telegram-Nachricht mit Trading Card gesendet
 
 ```
 ✅ [SCHRITT 4: ZUSAMMENFASSUNG & VERSAND ABGESCHLOSSEN]

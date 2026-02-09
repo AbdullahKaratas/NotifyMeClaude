@@ -180,14 +180,34 @@
 
 ---
 
+## SHORT-TRADE BEWERTUNG
+
+Nach Abschluss der Debate: Waere ein SHORT-Trade hier attraktiver als LONG?
+
+| Pruefpunkt | Ergebnis |
+|------------|----------|
+| Bear-Argumente Staerke | [X/10] |
+| Technische Short-Signale | [RSI ueberkauft? Death Cross? Distribution?] |
+| Katalysator fuer Downside | [Welcher?] |
+
+```
+REGEL:
+- Wenn Bear-Argumente >= 7/10: SHORT-Setup separat ausarbeiten
+- Wenn LONG-Konfidenz < 55%: SHORT als Alternative pruefen
+- Ergebnis wird in Schritt 3 (Judge) beruecksichtigt
+```
+
+---
+
 ## ENFORCEMENT
 
-- ✅ Minimum 4-6 Sätze pro Argument mit konkreten Zahlen
+- ✅ Minimum 4-6 Saetze pro Argument mit konkreten Zahlen
 - ✅ Jeder Analyst MUSS den Chart referenzieren
 - ✅ Bear MUSS Bull-Argumente explizit widerlegen
-- ✅ Kursziel mit Begründung (Chart-Level referenzieren)
-- ✅ 2 vollständige Runden durchgeführt
+- ✅ Kursziel mit Begruendung (Chart-Level referenzieren)
+- ✅ 2 vollstaendige Runden durchgefuehrt
 - ✅ Keine generischen Aussagen - nur konkrete Daten
+- ✅ SHORT-Trade Bewertung durchgefuehrt
 
 ```
 ✅ [SCHRITT 2: INVESTMENT DEBATE ABGESCHLOSSEN]

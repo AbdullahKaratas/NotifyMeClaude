@@ -71,12 +71,100 @@ Analysiere die Bull vs Bear Argumente aus Schritt 2:
 
 Basierend auf dem Signal: **[LONG/SHORT]**
 
-Nutze Chart-Levels (Support/Resistance) und ATR aus Schritt 1, um ein sinnvolles KO-Level zu bestimmen.
+```
+╔═══════════════════════════════════════════════════════════════╗
+║  KO-BERECHNUNG: ATR + CHART-SUPPORT KOMBINIERT               ║
+╠═══════════════════════════════════════════════════════════════╣
+║                                                               ║
+║  SCHRITT A: ATR-Multiplikator nach Asset-Klasse bestimmen    ║
+║  SCHRITT B: Chart-Support/Resistance identifizieren          ║
+║  SCHRITT C: KO = das WEITER ENTFERNTE von beiden             ║
+║                                                               ║
+║  ❌ NIEMALS KO zwischen Preis und Support setzen!            ║
+║  ❌ NIEMALS nur ATR ODER nur Chart nutzen - IMMER beides!    ║
+║                                                               ║
+╚═══════════════════════════════════════════════════════════════╝
+```
 
-**KO-Level:** $XX.XX
-**Abstand:** XX.X% vom aktuellen Preis
-**Hebel:** ~Xx
-**Begruendung:** [Welches Chart-Level? Warum genau hier?]
+### SCHRITT A: ATR-Multiplikator nach Asset-Klasse
+
+ATR (14) aus Schritt 1: **$XX.XX (X.X%)**
+
+| Asset-Klasse | Beispiele | ATR-Multiplikator | Warum |
+|-------------|-----------|-------------------|-------|
+| Large Cap Aktien | NVDA, AAPL, MSFT | 2.0x ATR | Stabile Orderbuecher, geringe Gap-Gefahr |
+| Mid/Small Cap Aktien | ARM, IREN, VST | 2.5x ATR | Duennere Liquiditaet, staerkere Earnings-Moves |
+| Rohstoffe (Gold, Silber) | GC=F, SI=F | 3.0x ATR | Makro-Schocks (Fed, Zoelle, Geopolitik), Gap-Risiko ueber Nacht |
+| Krypto-bezogen | MSTR, COIN | 3.0x ATR | Extreme Volatilitaet, 24/7 Underlying |
+| Gehebelte Indizes | QQQ, SPY Turbos | 2.0x ATR | Breit diversifiziert, weniger Einzelrisiko |
+
+**Bestimme die Asset-Klasse von {{SYMBOL}}:** [Klasse]
+**ATR-Multiplikator:** [X.Xx]
+**ATR-basiertes KO-Level (LONG):** Preis - (ATR x Multiplikator) = $XX.XX - ($XX.XX x X.X) = **$XX.XX**
+**ATR-basiertes KO-Level (SHORT):** Preis + (ATR x Multiplikator) = $XX.XX + ($XX.XX x X.X) = **$XX.XX**
+
+### SCHRITT B: Chart-Support als Mindestabstand
+
+Identifiziere die relevanten Chart-Levels aus Schritt 1:
+
+| Level | Preis | Staerke (1-5) | Begruendung |
+|-------|-------|---------------|-------------|
+| Naechster Support (S1) | $XX.XX | X/5 | [Warum ist das ein Support?] |
+| Starker Support (S2) | $XX.XX | X/5 | [Warum?] |
+| Kritischer Support (S3) | $XX.XX | X/5 | [Warum?] |
+
+**Chart-basiertes KO-Level:** Unter dem staerksten relevanten Support + Puffer (0.5-1%)
+→ Support bei $XX.XX → KO bei **$XX.XX** (Support - X%)
+
+### SCHRITT C: FINALES KO-LEVEL
+
+```
+╔═══════════════════════════════════════════════════════════════╗
+║                                                               ║
+║  REGEL: KO = das WEITER vom Preis ENTFERNTE Level            ║
+║                                                               ║
+║  ATR-basiert:    $XX.XX (XX.X% vom Preis)                    ║
+║  Chart-basiert:  $XX.XX (XX.X% vom Preis)                    ║
+║                                                               ║
+║  → FINALES KO:  $XX.XX (XX.X% vom Preis)                    ║
+║  → Hebel:       ~Xx                                          ║
+║  → Methode:     [ATR / Chart / Beide gleich]                 ║
+║                                                               ║
+╚═══════════════════════════════════════════════════════════════╝
+```
+
+**Begruendung:** [2-3 Saetze warum dieses KO-Level. Welches Chart-Level schuetzt? Warum reicht der ATR-Abstand (nicht)?]
+
+### EARNINGS / EVENT-WARNUNG
+
+```
+⚠️ EARNINGS/EVENT CHECK:
+- Naechster Earnings-Termin: [Datum oder "keiner in 2 Wochen"]
+- Andere Events (Fed, CPI, etc.): [Datum]
+- WENN Event < 5 Handelstage entfernt:
+  → ATR-Multiplikator um +0.5 erhoehen (Earnings-Gaps!)
+  → ODER Position vor Event teilweise schliessen
+```
+
+---
+
+## RISK-PER-TRADE CHECK
+
+```
+╔═══════════════════════════════════════════════════════════════╗
+║  PORTFOLIO-SCHUTZ                                            ║
+╠═══════════════════════════════════════════════════════════════╣
+║                                                               ║
+║  Portfolio-Wert (aus Supabase):     XXX EUR                  ║
+║  Max. Verlust pro Trade (10%):      XXX EUR                  ║
+║  Max. gleichzeitig riskiert (40%):  XXX EUR                  ║
+║  Aktuell riskiert (offene Pos.):    XXX EUR                  ║
+║  Noch verfuegbares Risiko-Budget:   XXX EUR                  ║
+║                                                               ║
+║  ⚠️ Wenn Risiko-Budget aufgebraucht → KEIN neuer Trade!     ║
+║                                                               ║
+╚═══════════════════════════════════════════════════════════════╝
+```
 
 ---
 
@@ -88,7 +176,7 @@ Nutze Chart-Levels (Support/Resistance) und ATR aus Schritt 1, um ein sinnvolles
 | Aktion | Preis | Begruendung |
 |--------|-------|-------------|
 | **Buy** | $XX.XX | [Warum hier einsteigen?] |
-| **KO-Level** | $XX.XX | [Chart-basiert] |
+| **KO-Level** | $XX.XX | [ATR + Chart kombiniert] |
 
 ### Exits (gestaffelt)
 | Aktion | Preis | Anteil | Begruendung |
@@ -100,8 +188,15 @@ Nutze Chart-Levels (Support/Resistance) und ATR aus Schritt 1, um ein sinnvolles
 ### Stops
 | Aktion | Preis | Anteil | Begruendung |
 |--------|-------|--------|-------------|
-| **Stop** | $XX.XX | XX% | [Welches Support-Level?] |
+| **Stop** | $XX.XX | XX% | [Mentaler Stop UEBER KO!] |
 | **Stop** | $XX.XX | Rest | [Absolutes Limit?] |
+
+### Time-Stops
+| Bedingung | Aktion |
+|-----------|--------|
+| Nach 5 Handelstagen <5% im Plus | Position halbieren |
+| Nach 8 Handelstagen seitwaerts | Position schliessen |
+| Earnings < 2 Tage entfernt | Min. 50% sichern |
 
 ### Watch Zones
 | Zone | Preis-Range | Was tun? |
@@ -115,10 +210,14 @@ Nutze Chart-Levels (Support/Resistance) und ATR aus Schritt 1, um ein sinnvolles
 
 - ✅ Judge analysiert Chart UNABHAENGIG von Bull/Bear
 - ✅ Signal-Box mit LONG/SHORT/HOLD + Konfidenz%
-- ✅ KO-Level mit Chart-Referenz und Begruendung
+- ✅ KO-Level mit BEIDEN Methoden berechnet (ATR + Chart)
+- ✅ ATR-Multiplikator nach Asset-Klasse differenziert
+- ✅ KO liegt IMMER unter dem staerksten Support (LONG) / ueber Resistance (SHORT)
+- ✅ Earnings/Event-Warnung geprueft
+- ✅ Risk-per-Trade Check gegen Portfolio-Limit
 - ✅ Gestaffelter Sell-Plan mit konkreten Preisen und Prozenten
+- ✅ Time-Stops definiert
 - ✅ Stop-Levels basierend auf Support-Zonen
-- ✅ Watch Zones fuer dynamische Anpassungen
 
 ```
 ✅ [SCHRITT 3: JUDGE & RISK ABGESCHLOSSEN]
