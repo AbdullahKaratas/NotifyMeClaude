@@ -131,6 +131,3 @@ Curated watchlist in Supabase `stocks` table, updated automatically via GitHub A
 
 Friends fork the repo and set up their own independent instance: own Telegram bot, own Supabase (free tier), own GitHub Actions. See `.env.template` + `ONBOARDING.md`.
 
-## Flutter App (Legacy)
-
-The repo also contains a Flutter reminder app with Supabase integration. This was the original approach before switching to the Telegram bot for all notifications. The Flutter code remains but is no longer the primary interface.
