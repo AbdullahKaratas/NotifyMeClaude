@@ -6,6 +6,30 @@ Trading notification system built around a Telegram bot and a multi-agent analys
 
 Each user runs their own independent instance: own Telegram bot, own Supabase DB, own GitHub Actions. See `ONBOARDING.md` (DE) or `ONBOARDING_EN.md` (EN).
 
+---
+
+## TRADING KONTEXT (Silver Hawk)
+
+### Ausgangslage
+- **Startkapital:** 957 EUR (Ende Januar 2026)
+- **Ziel:** 1.914 EUR (Verdopplung) bis Ende Februar 2026
+- **Instrumente:** Turbo-Zertifikate (Knockout-Produkte, Long UND Short)
+- **Plattform:** Trade Republic
+- **Gehandelte Assets:** Aktien, Rohstoffe (Gold, Silber) - alles via Turbos
+
+### Analyse-Prinzipien
+Die konkreten Trading-Entscheidungen (Entry, Exit, Stop, KO-Abstand) kommen aus der 4-Schritt-Analyse - nicht aus festen Regeln. Die Analyse liefert Support/Resistance, Konfidenz und Positionsgroesse pro Trade.
+
+Wichtig:
+- **Credentials NIEMALS in committed Files**
+- **Gewinne mitnehmen** wenn die Analyse es zeigt (D-Wave Lektion: waren +30% im Plus, nicht mitgenommen)
+
+### Aktueller Stand
+Portfolio (offene/geschlossene Positionen, Cash) lebt in der Supabase `portfolio` Tabelle.
+Analysen in `reminders`, Watchlist in `stocks`. Kein lokales State-File noetig.
+
+---
+
 ## Telegram Bot
 
 - Credentials stored in `.env` (never committed to git)
@@ -20,17 +44,13 @@ Each user runs their own independent instance: own Telegram bot, own Supabase DB
 
 ## Price Tracker (Personal)
 
-Price tracker configs are personal and NOT committed to the repo (in `.gitignore`).
-
-**`tracker_check_template.py`** - Template for price alerts. Copy and customize:
-```bash
-cp tracker_check_template.py tracker_check.py
-# Edit SYMBOLS, ALERT_RULES, and TRADING_ZONES with your stocks
-```
-
-- `tracker_check.py` - Your personal config (gitignored), runs via GitHub Actions
-- `price_tracker.py` - Local infinite-loop version (gitignored)
+**`tracker_check.py`** - Personal price alert config, runs via GitHub Actions.
+- Contains SYMBOLS, ALERT_RULES, and TRADING_ZONES
 - State (prev_prices, alerted_levels) persisted in Supabase `tracker_state` table
+
+**`tracker_check_template.py`** - Template for new users to copy and customize.
+
+**`price_tracker.py`** - Local infinite-loop version (gitignored).
 
 ### Alert Features
 - Flash move: >1.5% change in 5 minutes
@@ -46,7 +66,9 @@ cp tracker_check_template.py tracker_check.py
 
 ## Multi-Agent Analysis
 
-Run with: `Analysiere <SYMBOL> @prompts/00_master.md`
+**Skill:** `/analyse-stock SYMBOL` - runs the full 4-step pipeline automatically.
+
+**Manual:** `Analysiere <SYMBOL> @prompts/00_master.md`
 
 Language defaults to German. Change `{{LANGUAGE}}` in `prompts/00_master.md` for English output.
 
@@ -60,10 +82,9 @@ Language defaults to German. Change `{{LANGUAGE}}` in `prompts/00_master.md` for
 | 4 | `04_summary_send.md` | Trading card, full analysis, JSON, chart upload, DB insert |
 
 ### Key Analysis Features
-- **ATR-based KO planning:** ATR determines KO distance, NOT whether to trade
-- **Position sizing matrix:** 4 scenarios (Lotto 50 EUR / Klein 150 EUR / Standard 300 EUR / Ohne Hebel 200 EUR)
-- **Short interest analysis:** % of float, days to cover, squeeze potential
-- **Mental stop-loss:** Always ABOVE KO level to limit losses to ~30% instead of 100%
+- Each analysis produces concrete entry/exit/stop/KO recommendations based on technicals
+- ATR determines KO distance, short interest informs squeeze potential
+- Position sizing derived from analysis confidence and risk profile
 
 ### Chart Generation
 
@@ -80,6 +101,7 @@ Each user has their own Supabase project (free tier). Schema in `supabase/schema
 
 | Table | Purpose |
 |-------|---------|
+| `portfolio` | Open/closed positions, cash, P&L (symbol, qty, entry, KO, stop, target, status, pnl_eur) |
 | `reminders` | Analysis results (title, description, image_url, due_at, is_done) |
 | `stocks` | Watchlist (symbol, price, RSI, SMAs, analyst_rating, etc.) |
 | `tracker_state` | Price tracker state persistence (prev_prices, alerted_levels) |
@@ -130,6 +152,7 @@ Curated watchlist in Supabase `stocks` table, updated automatically via GitHub A
 |----------|------|----------|---------|
 | Stock Updater | `update_stocks.yml` | Every 30 min (market hours) | Update prices, RSI, SMAs |
 | Price Tracker | `tracker.yml` | Every 10 min (market hours) | Price alerts via Telegram |
+| Portfolio Check | `portfolio_check.yml` | 3x daily (08:00, 15:00, 21:00 CET) | RSI alerts, stop/KO proximity |
 
 Secrets needed: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`
 

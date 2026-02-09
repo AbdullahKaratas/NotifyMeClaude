@@ -242,13 +242,7 @@ Dokumentiere was du im Chart siehst:
 | Ann. Volatilitaet | XX% | Jahres-Volatilitaet |
 | Beta | X.XX | Markt-Sensitivitaet |
 
-**ATR-Einordnung (WICHTIG fuer Schritt 3!):**
-- ATR < 2%: Niedrig (enge KOs moeglich)
-- ATR 2-4%: Mittel (Standard KO-Abstaende)
-- ATR 4-8%: Hoch (weite KOs noetig, kleinere Position)
-- ATR > 8%: Extrem (sehr weite KOs oder alternatives Produkt)
-
-> **ATR ist KEIN Ausschlusskriterium!** ATR bestimmt den KO-ABSTAND, nicht ob getradet wird.
+ATR wird in Schritt 3 fuer die KO-Berechnung genutzt. Hier nur den Wert dokumentieren.
 
 ---
 

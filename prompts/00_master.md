@@ -48,13 +48,11 @@ Lies: prompts/04_summary_send.md
 
 ---
 
-## REGELN
+## QUALITAETS-ANFORDERUNGEN
 
 - **KEIN Schritt darf uebersprungen werden**
 - **yfinance IMMER zuerst** - keine Web-Suche fuer Preisdaten
 - **Chart wird von JEDEM Agenten analysiert**
 - **Jedes Argument: 4-6 Saetze mit konkreten Zahlen**
-- **ATR ist KEIN Ausschlusskriterium** - hohe ATR = weiterer KO, kleinere Position
-- **Immer 4 Positions-Szenarien bewerten** (Lotto/Klein/Standard/Ohne Hebel)
 - **Sprache:** {{LANGUAGE}} (Standard: Deutsch). Alle Analysen, Tabellen und Texte in dieser Sprache. JSON-Keys bleiben Englisch.
 - **Wenn du merkst dass du abkuerzt -> STOPP -> Mach es richtig!**

@@ -93,88 +93,6 @@ Schreibe eine vollständige Analyse mit folgender Struktur:
 
 ---
 
-## JSON OUTPUT
-
-```json
-{
-  "signal": "LONG | SHORT | HOLD | IGNORE",
-  "confidence": 0.XX,
-  "unable_to_assess": false,
-  "unable_to_assess_reason": null,
-  "price_usd": XX.XX,
-  "price_eur": XX.XX,
-  "chart_analysis": {
-    "trend": "BULLISH | BEARISH | NEUTRAL",
-    "sma_cross": "GOLDEN | DEATH | NONE",
-    "rsi_status": "OVERBOUGHT | OVERSOLD | NEUTRAL",
-    "volume_confirmation": true | false,
-    "money_flow": "ACCUMULATION | DISTRIBUTION | NEUTRAL",
-    "pattern": "DOUBLE_BOTTOM | HEAD_SHOULDERS | TRIANGLE | NONE"
-  },
-  "data_sources": {
-    "price": "yfinance",
-    "technicals": "yfinance + Chart",
-    "news": "Reuters/Bloomberg",
-    "chart": "trading-crew/charts/{{SYMBOL}}_chart.png"
-  },
-  "volatility": {
-    "atr_usd": XX.XX,
-    "atr_pct": X.X,
-    "beta": X.XX,
-    "annual_vol_pct": XX
-  },
-  "strategies": {
-    "conservative": {
-      "ko_level_usd": XX.XX,
-      "distance_pct": XX.X,
-      "atr_multiple": X.X,
-      "risk": "low"
-    },
-    "moderate": {
-      "ko_level_usd": XX.XX,
-      "distance_pct": XX.X,
-      "atr_multiple": X.X,
-      "risk": "medium"
-    },
-    "aggressive": {
-      "ko_level_usd": XX.XX,
-      "distance_pct": X.X,
-      "atr_multiple": X.X,
-      "risk": "high"
-    }
-  },
-  "position_sizing": {
-    "lotto_50eur": {"recommended": true, "product": "Turbo KO $XX", "expected_gain": "XX EUR", "max_loss": "50 EUR"},
-    "small_150eur": {"recommended": true, "product": "Turbo KO $XX", "expected_gain": "XX EUR", "max_loss": "XX EUR"},
-    "standard_300eur": {"recommended": true, "product": "Turbo KO $XX", "expected_gain": "XX EUR", "max_loss": "XX EUR"},
-    "unlevered_200eur": {"recommended": true, "product": "ETF/ETC/Aktie", "expected_gain": "XX EUR", "max_loss": "XX EUR"}
-  },
-  "stop_loss": {
-    "mental_stop_usd": XX.XX,
-    "ko_level_usd": XX.XX,
-    "buffer_pct": XX.X
-  },
-  "support_zones": [
-    {"level_usd": XX.XX, "description": "Begründung"},
-    {"level_usd": XX.XX, "description": "Begründung"},
-    {"level_usd": XX.XX, "description": "Begründung"}
-  ],
-  "resistance_zones": [
-    {"level_usd": XX.XX, "description": "Begründung"},
-    {"level_usd": XX.XX, "description": "Begründung"},
-    {"level_usd": XX.XX, "description": "Begründung"}
-  ],
-  "timeframes": {
-    "short_term": "LONG | SHORT | HOLD",
-    "medium_term": "LONG | SHORT | HOLD",
-    "long_term": "LONG | SHORT | HOLD"
-  },
-  "detailed_analysis": "500-800 words in {{LANGUAGE}}..."
-}
-```
-
----
-
 ## CHART HOCHLADEN (PFLICHT!)
 
 **Lies SUPABASE_URL und SUPABASE_ANON_KEY aus der `.env` Datei!**
@@ -204,8 +122,8 @@ Die App hat Markdown-Support im Detail-Screen. Der User will die **VOLLSTÄNDIGE
 **KEINE KURZFASSUNG! Sende ALLE Schritte:**
 - ✅ Schritt 1: yfinance Live-Daten + Chart-Analyse + News + Fundamentals
 - ✅ Schritt 2: Investment Debate (Bull Runde 1+2, Bear Runde 1+2)
-- ✅ Schritt 3: Investment Judge + Risk Debate (alle 3 Analysten)
-- ✅ Schritt 4: Trading Card + Ausführliche Analyse + JSON Output
+- ✅ Schritt 3: Investment Judge + Trade-Plan (Entry/Exits/Stops/Watch Zones)
+- ✅ Schritt 4: Trading Card + Ausführliche Analyse
 
 ```sql
 INSERT INTO reminders (title, description, image_url, due_at, is_done)
@@ -231,7 +149,6 @@ VALUES (
 - ✅ Minimum 500 Wörter in der Analyse
 - ✅ ALLE vorherigen Schritte in der Description
 - ✅ Chart-URL in image_url
-- ✅ JSON-Schema exakt einhalten
 - ✅ SQL INSERT ausführen
 
 ```
