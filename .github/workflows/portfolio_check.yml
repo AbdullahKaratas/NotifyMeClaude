@@ -1,0 +1,35 @@
+name: Silver Hawk Portfolio Check
+
+on:
+  schedule:
+    # 08:00 CET = 07:00 UTC (Morning overview)
+    - cron: '0 7 * * 1-5'
+    # 15:00 CET = 14:00 UTC (Before US market open)
+    - cron: '0 14 * * 1-5'
+    # 21:00 CET = 20:00 UTC (Evening - time to sell?)
+    - cron: '0 20 * * 1-5'
+  workflow_dispatch: # Manual trigger
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install yfinance numpy
+
+      - name: Run portfolio check
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python portfolio_check.py
