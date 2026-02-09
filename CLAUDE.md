@@ -17,12 +17,36 @@ Each user runs their own independent instance: own Telegram bot, own Supabase DB
 - **Plattform:** Trade Republic
 - **Gehandelte Assets:** Aktien, Rohstoffe (Gold, Silber) - alles via Turbos
 
+### Risk Management Regeln
+
+```
+╔═══════════════════════════════════════════════════════════════╗
+║  DIESE REGELN GELTEN IMMER - KEINE AUSNAHMEN!                ║
+╠═══════════════════════════════════════════════════════════════╣
+║                                                               ║
+║  1. Max. Verlust pro Trade:      10% des Portfolios          ║
+║  2. Max. gleichzeitig riskiert:  40% des Portfolios          ║
+║  3. Max. Sektor-Konzentration:   60% in einem Sektor         ║
+║  4. Nach 2 Verlusten in Folge:   Positionsgroesse halbieren  ║
+║  5. Nach -20% Drawdown:          24h Trading-Pause           ║
+║                                                               ║
+║  Credentials NIEMALS in committed Files!                     ║
+║                                                               ║
+╚═══════════════════════════════════════════════════════════════╝
+```
+
 ### Analyse-Prinzipien
+
 Die konkreten Trading-Entscheidungen (Entry, Exit, Stop, KO-Abstand) kommen aus der 4-Schritt-Analyse - nicht aus festen Regeln. Die Analyse liefert Support/Resistance, Konfidenz und Positionsgroesse pro Trade.
 
-Wichtig:
-- **Credentials NIEMALS in committed Files**
+**Kernprinzipien:**
 - **Gewinne mitnehmen** wenn die Analyse es zeigt (D-Wave Lektion: waren +30% im Plus, nicht mitgenommen)
+- **LONG und SHORT sind gleichwertig** - die Analyse entscheidet die Richtung, nicht ein Bias
+- **KO-Berechnung: ATR + Chart kombiniert** - KO liegt IMMER unter dem staerksten Support (LONG) bzw. ueber Resistance (SHORT). ATR-Multiplikator nach Asset-Klasse (Large Cap 2x, Small Cap 2.5x, Rohstoffe 3x)
+- **Time-Stops einhalten** - nach 5 Tagen ohne Bewegung halbieren, nach 8 Tagen raus
+- **Korrelation pruefen** - vor jedem neuen Trade Sektor-Konzentration checken
+- **Vor Earnings absichern** - min. 50% der Position vor dem Event sichern oder ATR-Multiplikator erhoehen
+- **Keine festen EUR-Betraege** - Positionsgroesse in % vom Portfolio (skaliert automatisch)
 
 ### Aktueller Stand
 Portfolio (offene/geschlossene Positionen, Cash) lebt in der Supabase `portfolio` Tabelle.
@@ -76,15 +100,20 @@ Language defaults to German. Change `{{LANGUAGE}}` in `prompts/00_master.md` for
 
 | Step | File | Agent Role |
 |------|------|-----------|
-| 1 | `01_data_collection.md` | yfinance data, chart, news, macro, ATR/volatility, short interest |
-| 2 | `02_investment_debate.md` | Bull vs Bear debate (2 rounds) |
-| 3 | `03_judge_risk.md` | Judge decision + confidence %, 3 risk analysts (ATR-based KO levels), position sizing matrix, stop-loss strategy |
-| 4 | `04_summary_send.md` | Trading card, full analysis, JSON, chart upload, DB insert |
+| 1 | `01_data_collection.md` | yfinance data, chart, news, macro, ATR/volatility, short interest, **correlation check**, **event calendar** |
+| 2 | `02_investment_debate.md` | Bull vs Bear debate (2 rounds), **SHORT-Trade Scorecard** |
+| 3 | `03_judge_risk.md` | Judge decision + confidence %, **ATR + Chart kombinierte KO-Berechnung**, risk-per-trade check, time-stops |
+| 4 | `04_summary_send.md` | Trading card, full analysis, JSON, chart upload, DB insert, **Telegram-Versand** |
 
 ### Key Analysis Features
 - Each analysis produces concrete entry/exit/stop/KO recommendations based on technicals
-- ATR determines KO distance, short interest informs squeeze potential
-- Position sizing derived from analysis confidence and risk profile
+- **KO = Maximum aus ATR-basiert und Chart-basiert** (immer das weiter entfernte Level)
+- **ATR-Multiplikator nach Asset-Klasse:** Large Cap 2.0x, Small/Mid Cap 2.5x, Rohstoffe 3.0x, Krypto 3.0x
+- **SHORT-Trades werden gleichwertig bewertet** via LONG vs SHORT Scorecard in Schritt 2
+- Position sizing in % vom Portfolio (5% Lotto / 15% Klein / 30% Standard / 20% Ohne Hebel)
+- Risk-per-trade capped at 10% Portfolio
+- Time-stops: 5 Tage ohne Bewegung → halbieren, 8 Tage → raus
+- Correlation check against open positions before each new trade
 
 ### Chart Generation
 
