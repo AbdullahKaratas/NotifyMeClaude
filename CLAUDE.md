@@ -105,6 +105,30 @@ CHART_OUTPUT_DIR=...        # Path to chart output directory
 
 Both `send_telegram.py` and `price_tracker.py` load `.env` via a `_load_env()` function (no external dependencies).
 
+## Stock Watchlist
+
+Curated watchlist in Supabase `stocks` table, updated automatically via GitHub Actions.
+
+### Scripts
+
+**`admin_stocks.py`** - Admin CLI for managing the watchlist.
+- `python admin_stocks.py list` - Show all stocks
+- `python admin_stocks.py add NVDA "NVIDIA" Technology` - Add a stock
+- `python admin_stocks.py remove NVDA` - Deactivate (soft delete)
+- `python admin_stocks.py seed` - Seed initial watchlist
+
+**`update_stocks.py`** - Fetches yfinance data and updates Supabase. Runs via GitHub Actions every 30 min during market hours.
+- Updates: price, change_pct, RSI, SMA50, SMA200, market_cap, volume, analyst_rating
+- Workflow: `.github/workflows/update_stocks.yml`
+
+**`browse_stocks.py`** - Read-only watchlist browser.
+- `python browse_stocks.py` - Formatted table grouped by sector
+- `python browse_stocks.py --json` - JSON output
+
+### Onboarding
+
+Friends fork the repo and set up their own independent instance: own Telegram bot, own Supabase (free tier), own GitHub Actions. See `.env.template` + `ONBOARDING.md`.
+
 ## Flutter App (Legacy)
 
 The repo also contains a Flutter reminder app with Supabase integration. This was the original approach before switching to the Telegram bot for all notifications. The Flutter code remains but is no longer the primary interface.

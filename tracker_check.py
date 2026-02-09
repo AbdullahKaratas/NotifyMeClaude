@@ -43,7 +43,7 @@ ALERT_RULES = {
     },
     'AAPL': {
         'above': [290, 300],
-        'below': [260, 250],
+        'below': [270, 265, 250],
     },
     'WDC': {
         'above': [290, 296, 310],
@@ -70,8 +70,8 @@ ALERT_RULES = {
         'below': [35, 32, 25, 18],
     },
     'ARM': {
-        'above': [119, 138, 150, 161],
-        'below': [100, 87, 80],
+        'above': [125, 130, 138, 150, 161],
+        'below': [112, 108, 94.43],
     },
     'ENR.DE': {
         'above': [150, 156.70, 165, 175],
@@ -80,7 +80,7 @@ ALERT_RULES = {
 }
 
 # ── AI Trading Context (updated per analysis session) ──
-# Last updated: 04.02.2026
+# Last updated: 06.02.2026
 TRADING_ZONES = {
     'SI=F': {
         'bias': 'LONG',
@@ -102,16 +102,18 @@ TRADING_ZONES = {
     },
     'AAPL': {
         'bias': 'LONG',
-        'context': 'Position offen: 213x Turbo HT7817, KO $233.78. +37% im Plus. Q1 Rekord: $143.8B Rev (+16%), EPS $2.84 (+19%). Signal LONG 72%. Updated 05.02.2026.',
+        'context': 'TEILVERKAUF: 100x verkauft, 165x verbleibend. KO $233.87. RSI 74 ueberkauft, kurzfristiger Pullback moeglich. Stop $265. Signal HOLD 62%. Updated 09.02.2026.',
         'zones': [
             {'type': 'SELL', 'price': 290, 'dir': 'above',
-             'note': 'ATH-Zone! 52W-Hoch $288.62. 50% Gewinn mitnehmen, Rest mit Stop $270 laufen lassen.'},
+             'note': '52W-Hoch Zone ($288.62)! Weitere 50x verkaufen. Rest mit Stop $275 laufen lassen.'},
             {'type': 'SELL', 'price': 300, 'dir': 'above',
-             'note': 'Psychologische Marke + Analyst Cluster. Starker Widerstand, Teilverkauf sinnvoll.'},
-            {'type': 'WATCH', 'price': 260, 'dir': 'below',
-             'note': 'Unter SMA 50 ($268)! Turbo-Gewinn schmilzt. 50% Position schliessen wenn Schlusskurs unter $260.'},
+             'note': 'Psychologische Marke + Analyst Mean $293. Starker Widerstand. Komplett raus oder enger Stop.'},
+            {'type': 'WATCH', 'price': 270, 'dir': 'below',
+             'note': 'Breakout-Level + SMA50 ($269). Wenn bricht = kurzfristiger Uptrend gebrochen.'},
+            {'type': 'STOP', 'price': 265, 'dir': 'below',
+             'note': 'STOP-LOSS! Unter SMA50 mit Puffer. Alle verbleibenden 165x verkaufen!'},
             {'type': 'DANGER', 'price': 250, 'dir': 'below',
-             'note': 'GEFAHR! Nur noch 7% ueber KO ($233.78). Unter Januar-Tief $248. Sofort absichern oder raus.'},
+             'note': 'GEFAHR! Nur noch 7% ueber KO ($233.87). Sofort raus wenn noch nicht geschehen.'},
         ],
     },
     'QBTS': {
@@ -190,7 +192,7 @@ TRADING_ZONES = {
     },
     'VST': {
         'bias': 'LONG',
-        'context': 'Extrem ueberverkauft RSI 17.6. Death Cross aber Forward P/E 15x bei EBITDA-Guidance $6.8-7.6B. Q4 Earnings 26.02. Analyst Target $230. Signal LONG 62%. Updated 05.02.2026.',
+        'context': 'NEUE POSITION geplant: Turbo LONG 200-300 EUR, KO ~$115. RSI 33.7, FwdPE 16x. Meta 20J-Nuklear-PPA. Q4 Earnings 26.02. Stop $138. Analyst Target $230. Signal LONG 58%. Updated 09.02.2026.',
         'zones': [
             {'type': 'BUY', 'price': 138, 'dir': 'below',
              'note': 'Heutiges Tief! Erste Position 25%. RSI extrem ueberverkauft bei 17.6.'},
@@ -256,24 +258,24 @@ TRADING_ZONES = {
     },
     'ARM': {
         'bias': 'LONG',
-        'context': 'Monopol Chip-Architektur. Q3 Rev +26%, Earnings +120%. MACD Crossover bullisch. $3.3B Cash. Death Cross noch aktiv. Signal LONG 65%. Updated 05.02.2026.',
+        'context': 'POSITION OFFEN: 64x Turbo KO $94.43. +57% P&L. Double Bottom $100, Earnings Gap Up $124. Sell-Plan gestrafft. Stop $108. Signal LONG 60%. Updated 09.02.2026.',
         'zones': [
-            {'type': 'BUY', 'price': 100, 'dir': 'below',
-             'note': 'Psychologische Marke! Heute getestet und gehalten. Erste Position aufbauen.'},
-            {'type': 'BUY', 'price': 87, 'dir': 'below',
-             'note': 'Starke Kaufzone! Mai-2025-Tief. Aggressiv kaufen. KO $72.'},
-            {'type': 'BUY', 'price': 80, 'dir': 'below',
-             'note': '52W-Tief! Letzte Verteidigung. All-in wenn Fundamentals stimmen.'},
-            {'type': 'WATCH', 'price': 119, 'dir': 'above',
-             'note': 'SMA 50 zurueckerobert! Wichtiges technisches Signal. Death Cross Heilung beginnt.'},
+            {'type': 'SELL', 'price': 125, 'dir': 'above',
+             'note': 'Erste Stufe! 10% verkaufen (6-7 Shares). Schnellen Gewinn sichern.'},
+            {'type': 'SELL', 'price': 130, 'dir': 'above',
+             'note': '25% verkaufen! Vorheriger Support wird Resistance. Stop auf Einstand.'},
             {'type': 'SELL', 'price': 138, 'dir': 'above',
-             'note': 'SMA 200! Hauptwiderstand. Teilgewinne sichern.'},
+             'note': 'SMA 200! Hauptwiderstand. 50% Position schliessen.'},
             {'type': 'SELL', 'price': 150, 'dir': 'above',
-             'note': 'Analyst Mean Target. 50% Position schliessen.'},
+             'note': 'Analyst Mean Target $149. Rest raus. Mission accomplished!'},
             {'type': 'SELL', 'price': 161, 'dir': 'above',
-             'note': 'Juli-2025-Hoch. Starker Widerstand. Gewinne sichern.'},
-            {'type': 'DANGER', 'price': 72, 'dir': 'below',
-             'note': 'GEFAHR! Unter 52W-Tief. Neuer Abwaertstrend. Alles raus.'},
+             'note': 'Juli-2025-Hoch. Komplett raus und feiern!'},
+            {'type': 'WATCH', 'price': 112, 'dir': 'below',
+             'note': 'Gap-Tief 06.02! Wenn unter $112 = Gap Fill wahrscheinlich. Aufpassen.'},
+            {'type': 'STOP', 'price': 108, 'dir': 'below',
+             'note': 'NEUER STOP-LOSS! Unter Earnings-Gap. Turbo sofort verkaufen!'},
+            {'type': 'DANGER', 'price': 94.43, 'dir': 'below',
+             'note': 'KO-LEVEL! Turbo wertlos bei $94.43. MUSS vorher raus sein!'},
         ],
     },
     'ENR.DE': {

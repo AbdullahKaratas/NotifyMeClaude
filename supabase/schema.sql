@@ -35,6 +35,40 @@ CREATE INDEX IF NOT EXISTS idx_reminders_due_at ON reminders(due_at);
 CREATE INDEX IF NOT EXISTS idx_reminders_is_done ON reminders(is_done);
 
 -- ============================================================
+-- Shared Stock Watchlist
+-- ============================================================
+-- Curated stock watchlist updated automatically via GitHub Actions.
+-- Friends can read this table to see what's being tracked.
+
+CREATE TABLE IF NOT EXISTS stocks (
+    symbol TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    sector TEXT,
+    price NUMERIC,
+    change_pct NUMERIC,
+    rsi NUMERIC,
+    sma50 NUMERIC,
+    sma200 NUMERIC,
+    market_cap BIGINT,
+    volume BIGINT,
+    analyst_rating TEXT,
+    is_active BOOLEAN DEFAULT TRUE,
+    added_by TEXT DEFAULT 'admin',
+    last_updated TIMESTAMPTZ DEFAULT NOW(),
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE stocks ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow all for anon" ON stocks
+    FOR ALL
+    USING (true)
+    WITH CHECK (true);
+
+CREATE INDEX IF NOT EXISTS idx_stocks_is_active ON stocks(is_active);
+CREATE INDEX IF NOT EXISTS idx_stocks_sector ON stocks(sector);
+
+-- ============================================================
 -- IMPORTANT: Enable Realtime in Supabase Dashboard
 -- ============================================================
 -- 1. Go to Database > Replication
