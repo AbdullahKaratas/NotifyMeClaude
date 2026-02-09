@@ -12,33 +12,43 @@
 
 ```
 ╔══════════════════════════════════════════════════════╗
-║  🎯 {{SYMBOL}} ANALYSE                               ║
+║  {{SYMBOL}} ANALYSE                                  ║
 ╠══════════════════════════════════════════════════════╣
 ║                                                      ║
-║  💵 Preis:     $XX.XX (€XX.XX)                      ║
-║  📊 Signal:    [🟢 LONG / 🔴 SHORT / 🟡 HOLD]       ║
-║  📈 Konfidenz: ████████░░ XX%                       ║
+║  Preis:     $XX.XX (EUR XX.XX)                       ║
+║  Signal:    [LONG / SHORT / HOLD]                    ║
+║  Konfidenz: XX%                                      ║
+║  ATR:       X.X% ($XX.XX/Tag)                        ║
 ║                                                      ║
 ╠══════════════════════════════════════════════════════╣
-║  🎯 KNOCKOUT STRATEGIEN                              ║
+║  KNOCKOUT STRATEGIEN                                 ║
 ╠══════════════════════════════════════════════════════╣
-║  🛡️ Konservativ: $XX.XX (XX% Abstand)               ║
-║  ⚖️ Moderat:     $XX.XX (XX% Abstand)               ║
-║  💰 Aggressiv:   $XX.XX (X% Abstand)                ║
+║  Konservativ: $XX.XX (XX% | Xx ATR)                  ║
+║  Moderat:     $XX.XX (XX% | Xx ATR)                  ║
+║  Aggressiv:   $XX.XX (X%  | Xx ATR)                  ║
+║  Stop-Loss:   $XX.XX (mental, XX% ueber KO)          ║
 ║                                                      ║
 ╠══════════════════════════════════════════════════════╣
-║  📉 SUPPORT         │  📈 RESISTANCE                 ║
+║  POSITIONS-EMPFEHLUNG                                ║
 ╠══════════════════════════════════════════════════════╣
-║  S1: $XX.XX         │  R1: $XX.XX                   ║
-║  S2: $XX.XX         │  R2: $XX.XX                   ║
-║  S3: $XX.XX         │  R3: $XX.XX                   ║
+║  Lotto (50 EUR):     [JA/NEIN] - [Produkt + KO]     ║
+║  Klein (150 EUR):    [JA/NEIN] - [Produkt + KO]     ║
+║  Standard (300 EUR): [JA/NEIN] - [Produkt + KO]     ║
+║  Ohne Hebel (200 EUR): [JA/NEIN] - [ETF/ETC/Aktie]  ║
 ║                                                      ║
 ╠══════════════════════════════════════════════════════╣
-║  ⏱️ ZEITHORIZONTE                                    ║
+║  SUPPORT              │  RESISTANCE                  ║
 ╠══════════════════════════════════════════════════════╣
-║  Kurzfristig:  [🟢/🔴/🟡] [LONG/SHORT/HOLD]         ║
-║  Mittelfristig:[🟢/🔴/🟡] [LONG/SHORT/HOLD]         ║
-║  Langfristig:  [🟢/🔴/🟡] [LONG/SHORT/HOLD]         ║
+║  S1: $XX.XX           │  R1: $XX.XX                  ║
+║  S2: $XX.XX           │  R2: $XX.XX                  ║
+║  S3: $XX.XX           │  R3: $XX.XX                  ║
+║                                                      ║
+╠══════════════════════════════════════════════════════╣
+║  ZEITHORIZONTE                                       ║
+╠══════════════════════════════════════════════════════╣
+║  Kurzfristig:  [LONG/SHORT/HOLD]                     ║
+║  Mittelfristig:[LONG/SHORT/HOLD]                     ║
+║  Langfristig:  [LONG/SHORT/HOLD]                     ║
 ║                                                      ║
 ╚══════════════════════════════════════════════════════╝
 ```
@@ -107,22 +117,42 @@ Schreibe eine vollständige Analyse mit folgender Struktur:
     "news": "Reuters/Bloomberg",
     "chart": "trading-crew/charts/{{SYMBOL}}_chart.png"
   },
+  "volatility": {
+    "atr_usd": XX.XX,
+    "atr_pct": X.X,
+    "beta": X.XX,
+    "annual_vol_pct": XX
+  },
   "strategies": {
     "conservative": {
       "ko_level_usd": XX.XX,
       "distance_pct": XX.X,
+      "atr_multiple": X.X,
       "risk": "low"
     },
     "moderate": {
       "ko_level_usd": XX.XX,
       "distance_pct": XX.X,
+      "atr_multiple": X.X,
       "risk": "medium"
     },
     "aggressive": {
       "ko_level_usd": XX.XX,
       "distance_pct": X.X,
+      "atr_multiple": X.X,
       "risk": "high"
     }
+  },
+  "position_sizing": {
+    "lotto_50eur": {"recommended": true, "product": "Turbo KO $XX", "expected_gain": "XX EUR", "max_loss": "50 EUR"},
+    "small_150eur": {"recommended": true, "product": "Turbo KO $XX", "expected_gain": "XX EUR", "max_loss": "XX EUR"},
+    "standard_300eur": {"recommended": true, "product": "Turbo KO $XX", "expected_gain": "XX EUR", "max_loss": "XX EUR"},
+    "unlevered_200eur": {"recommended": true, "product": "ETF/ETC/Aktie", "expected_gain": "XX EUR", "max_loss": "XX EUR"}
+  },
+  "stop_loss": {
+    "mental_stop_usd": XX.XX,
+    "ko_level_usd": XX.XX,
+    "buffer_pct": XX.X
   },
   "support_zones": [
     {"level_usd": XX.XX, "description": "Begründung"},

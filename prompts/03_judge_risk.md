@@ -68,64 +68,124 @@ Analysiere die Bull vs Bear Argumente aus Schritt 2:
 
 ## RISK DEBATE
 
-**Knockout-Levels für die Signal-Richtung!**
+**Knockout-Levels fuer die Signal-Richtung!**
 
-**Alle 3 Analysten MÜSSEN den Chart für ihre KO-Levels nutzen!**
+**Alle 3 Analysten MUESSEN den Chart UND die ATR fuer ihre KO-Levels nutzen!**
 
 Basierend auf dem Signal: **[LONG/SHORT]**
 
 ### Knockout Berechnung:
 - **LONG:** KO-Level UNTER aktuellem Preis
-- **SHORT:** KO-Level ÜBER aktuellem Preis
+- **SHORT:** KO-Level UEBER aktuellem Preis
 - **Formel:** `distance_pct = |preis - ko_level| / preis * 100`
+
+### ATR-Regel fuer KO-Planung:
+```
+╔═══════════════════════════════════════════════════════════════╗
+║  ATR ist KEIN Ausschlusskriterium!                           ║
+║  ATR bestimmt den MINDEST-ABSTAND des KO vom Preis.         ║
+║                                                               ║
+║  Faustregel: KO-Abstand >= 3x ATR (taegliche Schwankung)    ║
+║                                                               ║
+║  ATR 2% → KO mind. 6% Abstand                               ║
+║  ATR 5% → KO mind. 15% Abstand                              ║
+║  ATR 8% → KO mind. 24% Abstand                              ║
+║                                                               ║
+║  Hohe ATR = WEITERER KO, nicht "kein Trade"!                 ║
+╚═══════════════════════════════════════════════════════════════╝
+```
 
 ---
 
 ### RISKY ANALYST (Aggressiv)
 
-**Chart-Analyse für KO-Level:**
+**Chart-Analyse fuer KO-Level:**
 > [Welches nahe Support/Resistance-Level siehst du im Chart?]
 
 **KO-Level:** $XX.XX
 **Abstand:** X.X% vom aktuellen Preis
 **Hebel:** ~Xx
 **Risiko:** HOCH
+**ATR-Check:** Abstand = X.Xx ATR (mind. 2x noetig)
 
-> Begründung: [Warum dieses Level? Referenziere Chart-Levels!]
+> Begruendung: [Warum dieses Level? Referenziere Chart-Levels!]
 
 ### SAFE ANALYST (Konservativ)
 
-**Chart-Analyse für KO-Level:**
+**Chart-Analyse fuer KO-Level:**
 > [Welches weite Support/Resistance-Level siehst du im Chart?]
 
 **KO-Level:** $XX.XX
 **Abstand:** XX.X% vom aktuellen Preis
 **Hebel:** ~Xx
 **Risiko:** NIEDRIG
+**ATR-Check:** Abstand = X.Xx ATR (mind. 3x empfohlen)
 
-> Begründung: [Warum dieses Level? Referenziere Chart-Levels!]
+> Begruendung: [Warum dieses Level? Referenziere Chart-Levels!]
 
 ### NEUTRAL ANALYST (Moderat)
 
-**Chart-Analyse für KO-Level:**
+**Chart-Analyse fuer KO-Level:**
 > [Welches moderate Support/Resistance-Level siehst du im Chart?]
 
 **KO-Level:** $XX.XX
 **Abstand:** XX.X% vom aktuellen Preis
 **Hebel:** ~Xx
 **Risiko:** MITTEL
+**ATR-Check:** Abstand = X.Xx ATR (mind. 2.5x empfohlen)
 
-> Begründung: [Warum dieses Level? Referenziere Chart-Levels!]
+> Begruendung: [Warum dieses Level? Referenziere Chart-Levels!]
+
+---
+
+## POSITIONS-STRATEGIE
+
+**PFLICHT! Gib fuer JEDE Positionsgroesse eine konkrete Empfehlung:**
+
+### Positionsgroessen-Matrix
+
+| Groesse | Budget | Wann? | Empfohlenes Produkt | KO-Profil |
+|---------|--------|-------|---------------------|-----------|
+| **Lotto** | 50 EUR | Konfidenz < 55% ODER ATR > 8% | Turbo (weiter KO) | Konservativ |
+| **Klein** | 100-150 EUR | Konfidenz 55-65% | Turbo (moderat KO) | Moderat |
+| **Standard** | 200-300 EUR | Konfidenz > 65% UND ATR < 5% | Turbo (alle KOs) | Frei waehlbar |
+| **ETF/ETC** | 200-300 EUR | ATR > 5% UND laengerer Horizont | ETF/ETC ohne Hebel | Kein KO |
+
+### Konkrete Empfehlung:
+
+**Fuer diesen Trade:**
+
+| Szenario | Position | Produkt | KO/Stop | Erwarteter Gewinn | Max. Verlust |
+|----------|----------|---------|---------|--------------------|--------------|
+| Lotto (50 EUR) | [JA/NEIN] | [Turbo KO $XX] | Stop $XX | +XX EUR bei Ziel | -50 EUR |
+| Klein (150 EUR) | [JA/NEIN] | [Turbo KO $XX] | Stop $XX | +XX EUR bei Ziel | -XX EUR |
+| Standard (300 EUR) | [JA/NEIN] | [Turbo KO $XX] | Stop $XX | +XX EUR bei Ziel | -XX EUR |
+| Ohne Hebel (200 EUR) | [JA/NEIN] | [ETF/ETC/Aktie] | Stop $XX | +XX EUR bei Ziel | -XX EUR |
+
+> **Entscheide PRO Szenario** ob es sich lohnt. Ein Trade kann als "Lotto 50 EUR" Sinn machen, aber als "Standard 300 EUR" nicht!
+
+### Stop-Loss Strategie
+
+| Level | Preis | Typ | Aktion |
+|-------|-------|-----|--------|
+| **Mentaler Stop** | $XX.XX | Verkaufen bei Unterschreitung | Position schliessen |
+| **KO-Level** | $XX.XX | Automatischer Totalverlust | Kein Handeln noetig |
+| **Abstand Stop → KO** | XX% | Puffer zwischen Stop und KO | Je groesser desto besser |
+
+> Der mentale Stop sollte IMMER deutlich UEBER dem KO liegen. So begrenzt du Verluste auf z.B. -30% statt auf -100%.
 
 ---
 
 ## ENFORCEMENT
 
-- ✅ Judge analysiert Chart UNABHÄNGIG von Bull/Bear
+- ✅ Judge analysiert Chart UNABHAENGIG von Bull/Bear
 - ✅ Signal-Box mit LONG/SHORT/HOLD + Konfidenz%
-- ✅ Alle KO-Levels mit Chart-Referenz und Abstand%
+- ✅ Alle KO-Levels mit Chart-Referenz, Abstand% UND ATR-Check
 - ✅ 3 verschiedene Risiko-Profile (Aggressiv, Konservativ, Moderat)
-- ✅ Jedes KO-Level mit Begründung warum genau dieses Level
+- ✅ Jedes KO-Level mit Begruendung warum genau dieses Level
+- ✅ Positions-Matrix mit 4 Szenarien (Lotto/Klein/Standard/Ohne Hebel)
+- ✅ Stop-Loss Strategie mit mentalem Stop UEBER dem KO
+- ✅ ATR wird als INPUT fuer KO-Abstand genutzt, NICHT als Ausschlusskriterium
 
 ```
 ✅ [SCHRITT 3: JUDGE & RISK ABGESCHLOSSEN]

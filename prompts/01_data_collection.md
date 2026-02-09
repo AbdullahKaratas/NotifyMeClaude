@@ -121,6 +121,16 @@ print(f'  Target Mean:        ${info.get("targetMeanPrice", 0):.0f}')
 print(f'  Target Low:         ${info.get("targetLowPrice", 0):.0f}')
 print(f'  Recommendation:     {info.get("recommendationKey", "N/A").upper()}')
 print()
+print('📐 VOLATILITAET')
+atr_data = hist['High'] - hist['Low']
+atr14 = atr_data.rolling(14).mean().iloc[-1]
+atr_pct = (atr14 / price) * 100
+ann_vol = hist['Close'].pct_change().std() * (252**0.5) * 100
+beta = info.get('beta', 'N/A')
+print(f'  ATR (14):           ${atr14:.2f} ({atr_pct:.1f}%)')
+print(f'  Ann. Volatilitaet:  {ann_vol:.0f}%')
+print(f'  Beta:               {beta}')
+print()
 print('⚠️ RISK SCORES')
 print(f'  Overall Risk:       {info.get("overallRisk", "N/A")}/10')
 ```
@@ -206,7 +216,25 @@ Dokumentiere was du im Chart siehst:
 | S2 | $XX.XX | Support | [Warum?] |
 | S3 | $XX.XX | Support | [Warum?] |
 
-## 1.5 News & Katalysatoren
+## 1.5 Volatilitaet & Risiko-Profil
+
+| Datenpunkt | Wert | Bedeutung |
+|------------|------|-----------|
+| ATR (14) | $XX.XX (X.X%) | Durchschnittliche Tagesschwankung |
+| Ann. Volatilitaet | XX% | Jahres-Volatilitaet |
+| Beta | X.XX | Markt-Sensitivitaet |
+
+**ATR-Einordnung (WICHTIG fuer Schritt 3!):**
+- ATR < 2%: Niedrig (enge KOs moeglich)
+- ATR 2-4%: Mittel (Standard KO-Abstaende)
+- ATR 4-8%: Hoch (weite KOs noetig, kleinere Position)
+- ATR > 8%: Extrem (sehr weite KOs oder alternatives Produkt)
+
+> **ATR ist KEIN Ausschlusskriterium!** ATR bestimmt den KO-ABSTAND, nicht ob getradet wird.
+
+---
+
+## 1.6 News & Katalysatoren
 
 **Suche ECHTE NEWS! Nutze Web-Suche für aktuelle Headlines!**
 
@@ -235,7 +263,7 @@ Suchquellen:
 - News 4: [Erklärung]
 - News 5: [Erklärung]
 
-## 1.6 Makro-Faktoren
+## 1.7 Makro-Faktoren
 
 **Aktuelle Werte via Web-Suche:**
 - Fed/Zinsen: [Aktueller Stand + nächstes Meeting Datum]
@@ -244,7 +272,7 @@ Suchquellen:
 - Treasury 10Y: [Aktueller Yield]
 - Geopolitik: [Aktuelle Konflikte/Events die relevant sind]
 
-## 1.7 Fundamentaldaten
+## 1.8 Fundamentaldaten
 
 | Faktor | Status | Details |
 |--------|--------|---------|

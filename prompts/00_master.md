@@ -25,14 +25,16 @@ Lies: prompts/02_investment_debate.md
 - Führe 2 vollständige Debate-Runden durch (Bull vs Bear)
 - **Output:** Vollständiges Debate-Transkript
 
-### Schritt 3: Judge & Risk
+### Schritt 3: Judge, Risk & Positionierung
 ```
 Lies: prompts/03_judge_risk.md
 ```
 - **Input:** Datenblock aus Schritt 1 + Debate aus Schritt 2 + Chart
-- Judge bewertet unabhängig, gibt Signal + Konfidenz
-- 3 Risk-Analysten definieren KO-Levels
-- **Output:** Signal, Konfidenz, 3 KO-Strategien
+- Judge bewertet unabhaengig, gibt Signal + Konfidenz
+- 3 Risk-Analysten definieren KO-Levels (ATR-basiert!)
+- Positions-Matrix: 4 Szenarien (Lotto/Klein/Standard/Ohne Hebel)
+- Stop-Loss Strategie mit mentalem Stop ueber KO
+- **Output:** Signal, Konfidenz, 3 KO-Strategien, Positions-Empfehlungen
 
 ### Schritt 4: Zusammenfassung & Versand
 ```
@@ -47,9 +49,11 @@ Lies: prompts/04_summary_send.md
 
 ## REGELN
 
-- **KEIN Schritt darf übersprungen werden**
-- **yfinance IMMER zuerst** - keine Web-Suche für Preisdaten
+- **KEIN Schritt darf uebersprungen werden**
+- **yfinance IMMER zuerst** - keine Web-Suche fuer Preisdaten
 - **Chart wird von JEDEM Agenten analysiert**
-- **Jedes Argument: 4-6 Sätze mit konkreten Zahlen**
-- **Sprache:** Deutsch (außer JSON-Keys)
-- **Wenn du merkst dass du abkürzt → STOPP → Mach es richtig!**
+- **Jedes Argument: 4-6 Saetze mit konkreten Zahlen**
+- **ATR ist KEIN Ausschlusskriterium** - hohe ATR = weiterer KO, kleinere Position
+- **Immer 4 Positions-Szenarien bewerten** (Lotto/Klein/Standard/Ohne Hebel)
+- **Sprache:** Deutsch (ausser JSON-Keys)
+- **Wenn du merkst dass du abkuerzt -> STOPP -> Mach es richtig!**
