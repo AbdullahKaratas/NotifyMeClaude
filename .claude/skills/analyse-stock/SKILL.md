@@ -38,9 +38,10 @@ Lies und fuehre aus: `prompts/02_investment_debate.md`
 Lies und fuehre aus: `prompts/03_judge_risk.md`
 - Judge bewertet UNABHAENGIG (inkl. Chart!)
 - Signal + Konfidenz-Score
-- 3 Risk-Analysten mit ATR-basierten KO-Levels
-- Positions-Matrix: 4 Szenarien (Lotto 50 EUR / Klein 150 EUR / Standard 300 EUR / Ohne Hebel 200 EUR)
-- Stop-Loss Strategie (mentaler Stop UEBER KO)
+- 3-Schritt KO-Berechnung (ATR-Multiplikator nach Asset-Klasse + Chart-Support + weiter entferntes Level)
+- Earnings/Event-Warnung
+- Risk-per-Trade Check gegen Portfolio (10% max, 40% gleichzeitig)
+- Trade-Plan: Entry/Exits/Stops/Time-Stops/Watch Zones
 
 ### Schritt 4: Zusammenfassung & Versand
 Lies und fuehre aus: `prompts/04_summary_send.md`
