@@ -158,6 +158,21 @@ Schau mit `python3 browse_stocks.py` was auf der Watchlist steht, oder analysier
 
 ---
 
+## Sprache aendern
+
+Die Analyse-Ausgabe ist standardmaessig auf **Deutsch**. Um auf Englisch umzustellen:
+
+Oeffne `prompts/00_master.md` in deinem Fork und aendere:
+```
+{{LANGUAGE}} = English
+```
+
+Alle Analysen, Tabellen und Texte kommen dann auf Englisch.
+
+> English speakers: see `ONBOARDING_EN.md` for the full setup guide in English.
+
+---
+
 ## Watchlist verwalten
 
 ```bash

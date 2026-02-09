@@ -55,7 +55,7 @@
 
 ---
 
-## AUSFÜHRLICHE ANALYSE (Deutsch, 500-800 Wörter)
+## AUSFUEHRLICHE ANALYSE ({{LANGUAGE}}, 500-800 Woerter)
 
 **PFLICHT! Minimum 500 Wörter!**
 
@@ -169,7 +169,7 @@ Schreibe eine vollständige Analyse mit folgender Struktur:
     "medium_term": "LONG | SHORT | HOLD",
     "long_term": "LONG | SHORT | HOLD"
   },
-  "detailed_analysis": "500-800 Wörter auf Deutsch..."
+  "detailed_analysis": "500-800 words in {{LANGUAGE}}..."
 }
 ```
 
