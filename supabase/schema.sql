@@ -25,7 +25,7 @@ ALTER TABLE reminders ENABLE ROW LEVEL SECURITY;
 
 -- Policy: Allow all operations for anonymous users
 -- This is fine for personal use since only you have the API key
-CREATE POLICY "Allow all for anon" ON reminders
+CREATE POLICY "Allow all for anon on reminders" ON reminders
     FOR ALL
     USING (true)
     WITH CHECK (true);
@@ -38,7 +38,7 @@ CREATE INDEX IF NOT EXISTS idx_reminders_is_done ON reminders(is_done);
 -- Shared Stock Watchlist
 -- ============================================================
 -- Curated stock watchlist updated automatically via GitHub Actions.
--- Friends can read this table to see what's being tracked.
+-- Each instance has its own watchlist in its own Supabase project.
 
 CREATE TABLE IF NOT EXISTS stocks (
     symbol TEXT PRIMARY KEY,
@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS stocks (
 
 ALTER TABLE stocks ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Allow all for anon" ON stocks
+CREATE POLICY "Allow all for anon on stocks" ON stocks
     FOR ALL
     USING (true)
     WITH CHECK (true);

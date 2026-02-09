@@ -103,7 +103,9 @@ CHART_SCRIPT=...            # Path to chart generation script
 CHART_OUTPUT_DIR=...        # Path to chart output directory
 ```
 
-Both `send_telegram.py` and `price_tracker.py` load `.env` via a `_load_env()` function (no external dependencies).
+**`supabase_client.py`** - Shared Supabase client module. Loads `.env` and provides `supabase_request()`.
+- Imported by `admin_stocks.py`, `update_stocks.py`, `browse_stocks.py`
+- `send_telegram.py` and `price_tracker.py` have their own `_load_env()` (no external dependencies needed)
 
 ## Stock Watchlist
 

@@ -1,46 +1,11 @@
 #!/usr/bin/env python3
 """Silver Hawk Trading - Stock Data Updater (GitHub Actions).
-Reads active symbols from Supabase stocks table, fetches yfinance data, upserts back."""
+Reads active symbols from Supabase stocks table, fetches yfinance data, updates back."""
 
-import urllib.request
 import urllib.parse
-import json
-import os
 from datetime import datetime, timezone
 
-
-def _load_env():
-    """Load .env file into os.environ."""
-    env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env')
-    if os.path.exists(env_path):
-        with open(env_path) as f:
-            for line in f:
-                line = line.strip()
-                if line and not line.startswith('#') and '=' in line:
-                    key, val = line.split('=', 1)
-                    os.environ.setdefault(key.strip(), val.strip())
-
-_load_env()
-
-SUPABASE_URL = os.environ['SUPABASE_URL']
-SUPABASE_KEY = os.environ['SUPABASE_ANON_KEY']
-
-
-def supabase_request(method, path, data=None):
-    """Make a request to Supabase REST API."""
-    url = f'{SUPABASE_URL}/rest/v1/{path}'
-    body = json.dumps(data).encode() if data else None
-    req = urllib.request.Request(url, data=body, method=method)
-    req.add_header('apikey', SUPABASE_KEY)
-    req.add_header('Authorization', f'Bearer {SUPABASE_KEY}')
-    req.add_header('Content-Type', 'application/json')
-    req.add_header('Prefer', 'return=representation')
-    try:
-        resp = urllib.request.urlopen(req)
-        return json.loads(resp.read())
-    except Exception as e:
-        print(f'  Supabase error: {e}')
-        return None
+from supabase_client import supabase_request
 
 
 def get_active_symbols():
@@ -61,9 +26,8 @@ def fetch_stock_data(symbols):
         try:
             t = yf.Ticker(sym)
             info = t.info
-
-            # Calculate RSI and SMAs from history
             hist = t.history(period='3mo')
+
             rsi = None
             sma50 = None
             sma200 = None
@@ -73,21 +37,18 @@ def fetch_stock_data(symbols):
                 gain = delta.where(delta > 0, 0).rolling(window=14).mean()
                 loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
                 rs = gain / loss
-                rsi_series = 100 - (100 / (1 + rs))
-                rsi_val = rsi_series.iloc[-1]
+                rsi_val = float((100 - (100 / (1 + rs))).iloc[-1])
                 if not np.isnan(rsi_val):
-                    rsi = round(float(rsi_val), 1)
+                    rsi = round(rsi_val, 1)
 
             if len(hist) >= 50:
                 sma50 = round(float(hist['Close'].rolling(50).mean().iloc[-1]), 2)
 
-            # SMA200 needs more data
             hist_long = t.history(period='1y')
             if len(hist_long) >= 200:
                 sma200 = round(float(hist_long['Close'].rolling(200).mean().iloc[-1]), 2)
 
-            # Analyst rating
-            rating = info.get('recommendationKey', None)
+            rating = info.get('recommendationKey')
             if rating:
                 rating = rating.replace('_', ' ').title()
 
@@ -101,9 +62,8 @@ def fetch_stock_data(symbols):
                 'volume': info.get('regularMarketVolume'),
                 'analyst_rating': rating,
             }
-            price = results[sym]['price']
-            chg = results[sym]['change_pct']
-            print(f'  {sym}: ${price} ({chg:+.1f}%) RSI={rsi} SMA50={sma50} SMA200={sma200} [{rating}]')
+            r = results[sym]
+            print(f'  {sym}: ${r["price"]} ({r["change_pct"]:+.1f}%) RSI={rsi} SMA50={sma50} SMA200={sma200} [{rating}]')
 
         except Exception as e:
             print(f'  {sym}: ERROR - {e}')
@@ -113,7 +73,7 @@ def fetch_stock_data(symbols):
 
 
 def update_supabase(data):
-    """Upsert stock data back to Supabase."""
+    """Update stock data in Supabase."""
     now = datetime.now(timezone.utc).isoformat()
     updated = 0
 
@@ -121,11 +81,7 @@ def update_supabase(data):
         if vals is None:
             continue
 
-        row = {
-            'symbol': sym,
-            'last_updated': now,
-        }
-        # Only include non-None values
+        row = {'last_updated': now}
         for key in ('price', 'change_pct', 'rsi', 'sma50', 'sma200', 'market_cap', 'volume', 'analyst_rating'):
             if vals.get(key) is not None:
                 row[key] = vals[key]

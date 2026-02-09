@@ -1,46 +1,11 @@
 #!/usr/bin/env python3
 """Silver Hawk Trading - Admin CLI for managing the shared stock watchlist."""
 
-import urllib.request
 import urllib.parse
-import json
 import sys
-import os
 from datetime import datetime, timezone
 
-
-def _load_env():
-    """Load .env file into os.environ."""
-    env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env')
-    if os.path.exists(env_path):
-        with open(env_path) as f:
-            for line in f:
-                line = line.strip()
-                if line and not line.startswith('#') and '=' in line:
-                    key, val = line.split('=', 1)
-                    os.environ.setdefault(key.strip(), val.strip())
-
-_load_env()
-
-SUPABASE_URL = os.environ['SUPABASE_URL']
-SUPABASE_KEY = os.environ['SUPABASE_ANON_KEY']
-
-
-def supabase_request(method, path, data=None):
-    """Make a request to Supabase REST API."""
-    url = f'{SUPABASE_URL}/rest/v1/{path}'
-    body = json.dumps(data).encode() if data else None
-    req = urllib.request.Request(url, data=body, method=method)
-    req.add_header('apikey', SUPABASE_KEY)
-    req.add_header('Authorization', f'Bearer {SUPABASE_KEY}')
-    req.add_header('Content-Type', 'application/json')
-    req.add_header('Prefer', 'return=representation')
-    try:
-        resp = urllib.request.urlopen(req)
-        return json.loads(resp.read())
-    except urllib.error.HTTPError as e:
-        print(f'Error: {e.code} {e.read().decode()}')
-        return None
+from supabase_client import supabase_request
 
 
 def list_stocks():
@@ -73,21 +38,18 @@ def list_stocks():
 def add_stock(symbol, name, sector=None):
     """Add a stock to the watchlist."""
     symbol = symbol.upper()
+    now = datetime.now(timezone.utc).isoformat()
     data = {
         'symbol': symbol,
         'name': name,
         'sector': sector,
         'is_active': True,
         'added_by': 'admin',
-        'created_at': datetime.now(timezone.utc).isoformat(),
-        'last_updated': datetime.now(timezone.utc).isoformat(),
+        'created_at': now,
+        'last_updated': now,
     }
 
-    result = supabase_request(
-        'POST',
-        'stocks?on_conflict=symbol',
-        data
-    )
+    result = supabase_request('POST', 'stocks?on_conflict=symbol', data)
     if result:
         print(f'Added: {symbol} ({name}) [{sector or "no sector"}]')
     else:
@@ -108,30 +70,31 @@ def remove_stock(symbol):
         print(f'Failed to deactivate {symbol}')
 
 
+SEED_STOCKS = [
+    ('AAPL', 'Apple', 'Technology'),
+    ('ARM', 'ARM Holdings', 'Technology'),
+    ('NVDA', 'NVIDIA', 'Technology'),
+    ('GOOGL', 'Alphabet', 'Technology'),
+    ('QBTS', 'D-Wave Quantum', 'Technology'),
+    ('WDC', 'Western Digital', 'Technology'),
+    ('IREN', 'IREN', 'Technology'),
+    ('VST', 'Vistra Energy', 'Energy'),
+    ('ENR.DE', 'Siemens Energy', 'Energy'),
+    ('RKLB', 'Rocket Lab', 'Aerospace'),
+    ('SI=F', 'Silver Futures', 'Commodities'),
+    ('GC=F', 'Gold Futures', 'Commodities'),
+]
+
+
 def seed_watchlist():
     """Seed the watchlist with our current tracked symbols."""
-    stocks = [
-        ('AAPL', 'Apple', 'Technology'),
-        ('ARM', 'ARM Holdings', 'Technology'),
-        ('NVDA', 'NVIDIA', 'Technology'),
-        ('GOOGL', 'Alphabet', 'Technology'),
-        ('QBTS', 'D-Wave Quantum', 'Technology'),
-        ('WDC', 'Western Digital', 'Technology'),
-        ('IREN', 'IREN', 'Technology'),
-        ('VST', 'Vistra Energy', 'Energy'),
-        ('ENR.DE', 'Siemens Energy', 'Energy'),
-        ('RKLB', 'Rocket Lab', 'Aerospace'),
-        ('SI=F', 'Silver Futures', 'Commodities'),
-        ('GC=F', 'Gold Futures', 'Commodities'),
-    ]
     print('Seeding watchlist...')
-    for symbol, name, sector in stocks:
+    for symbol, name, sector in SEED_STOCKS:
         add_stock(symbol, name, sector)
-    print(f'\nDone! Seeded {len(stocks)} stocks.')
+    print(f'\nDone! Seeded {len(SEED_STOCKS)} stocks.')
 
 
-def usage():
-    print("""
+USAGE = """
 Silver Hawk Trading - Stock Admin
 
 Usage:
@@ -139,12 +102,12 @@ Usage:
   python admin_stocks.py add NVDA "NVIDIA" Technology  Add a stock
   python admin_stocks.py remove NVDA                   Deactivate a stock
   python admin_stocks.py seed                          Seed initial watchlist
-""")
+"""
 
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
-        usage()
+        print(USAGE)
         sys.exit(1)
 
     cmd = sys.argv[1].lower()
@@ -165,4 +128,4 @@ if __name__ == '__main__':
     elif cmd == 'seed':
         seed_watchlist()
     else:
-        usage()
+        print(USAGE)
