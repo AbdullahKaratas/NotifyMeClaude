@@ -18,3 +18,7 @@ __pycache__/
 # Environment secrets
 .env
 telegram_config.json
+
+# Personal tracker configs (use tracker_check_template.py to create your own)
+tracker_check.py
+price_tracker.py

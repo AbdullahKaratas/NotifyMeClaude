@@ -216,7 +216,25 @@ Dokumentiere was du im Chart siehst:
 | S2 | $XX.XX | Support | [Warum?] |
 | S3 | $XX.XX | Support | [Warum?] |
 
-## 1.5 Volatilitaet & Risiko-Profil
+## 1.5 Short Interest
+
+| Datenpunkt | Wert | Bedeutung |
+|------------|------|-----------|
+| Short % of Float | XX.X% | Anteil der geshorteten Aktien |
+| Short Ratio (Days to Cover) | X.X | Tage um alle Shorts zu covern |
+
+**Short-Interest-Einordnung:**
+- < 5%: Normal, kein besonderes Signal
+- 5-10%: Erhoehte Skepsis, beobachten
+- 10-20%: Hohes Short Interest, Short-Squeeze-Potential bei positiven Katalysatoren
+- \> 20%: Extrem hoch, starkes Squeeze-Potential ABER auch starke bearishe Ueberzeugung
+- Short Ratio > 5 Tage: Shorts koennen nicht schnell covern -> Squeeze-Risiko steigt
+
+> **Hoher Short Interest ist KEIN automatisches Kaufsignal!** Er zeigt Skepsis, kann aber bei Katalysatoren (Earnings Beat, News) explosive Moves ausloesen.
+
+---
+
+## 1.6 Volatilitaet & Risiko-Profil
 
 | Datenpunkt | Wert | Bedeutung |
 |------------|------|-----------|
@@ -234,7 +252,7 @@ Dokumentiere was du im Chart siehst:
 
 ---
 
-## 1.6 News & Katalysatoren
+## 1.7 News & Katalysatoren
 
 **Suche ECHTE NEWS! Nutze Web-Suche für aktuelle Headlines!**
 
@@ -263,7 +281,7 @@ Suchquellen:
 - News 4: [Erklärung]
 - News 5: [Erklärung]
 
-## 1.7 Makro-Faktoren
+## 1.8 Makro-Faktoren
 
 **Aktuelle Werte via Web-Suche:**
 - Fed/Zinsen: [Aktueller Stand + nächstes Meeting Datum]
@@ -272,7 +290,7 @@ Suchquellen:
 - Treasury 10Y: [Aktueller Yield]
 - Geopolitik: [Aktuelle Konflikte/Events die relevant sind]
 
-## 1.8 Fundamentaldaten
+## 1.9 Fundamentaldaten
 
 | Faktor | Status | Details |
 |--------|--------|---------|

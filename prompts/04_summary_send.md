@@ -177,18 +177,20 @@ Schreibe eine vollständige Analyse mit folgender Struktur:
 
 ## CHART HOCHLADEN (PFLICHT!)
 
+**Lies SUPABASE_URL und SUPABASE_ANON_KEY aus der `.env` Datei!**
+
 **1. Chart zu Supabase Storage hochladen:**
 ```bash
-curl -X POST "https://zeisrosiohbnasvinlmp.supabase.co/storage/v1/object/charts/{{SYMBOL}}_chart.png" \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InplaXNyb3Npb2hibmFzdmlubG1wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk1MTg2NTEsImV4cCI6MjA4NTA5NDY1MX0.viQcx3dO9J9WWmnnH4gt4_S0DzXNbeRBENy5Es5jOIw" \
+curl -X POST "${SUPABASE_URL}/storage/v1/object/charts/{{SYMBOL}}_chart.png" \
+  -H "Authorization: Bearer ${SUPABASE_ANON_KEY}" \
   -H "Content-Type: image/png" \
   -H "x-upsert: true" \
-  --data-binary @/Users/I516965/Documents/PRIVATE/trading-crew/charts/{{SYMBOL}}_chart.png
+  --data-binary @${CHART_OUTPUT_DIR}/{{SYMBOL}}_chart.png
 ```
 
 **2. Chart-URL:**
 ```
-https://zeisrosiohbnasvinlmp.supabase.co/storage/v1/object/public/charts/{{SYMBOL}}_chart.png
+${SUPABASE_URL}/storage/v1/object/public/charts/{{SYMBOL}}_chart.png
 ```
 
 ---
@@ -210,7 +212,7 @@ INSERT INTO reminders (title, description, image_url, due_at, is_done)
 VALUES (
   '🎯 {{SYMBOL}} Multi-Agent Analyse',
   '[VOLLSTÄNDIGE ANALYSE - ALLE SCHRITTE MIT ALLEN DETAILS]',
-  'https://zeisrosiohbnasvinlmp.supabase.co/storage/v1/object/public/charts/{{SYMBOL}}_chart.png',
+  '${SUPABASE_URL}/storage/v1/object/public/charts/{{SYMBOL}}_chart.png',
   NOW(),
   false
 );

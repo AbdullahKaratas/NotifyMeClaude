@@ -114,7 +114,7 @@ python3 browse_stocks.py
 
 ## Step 7: Set Up GitHub Actions (recommended!)
 
-This runs price updates and alerts automatically - even when your computer is off.
+This runs price updates automatically - even when your computer is off.
 
 1. Go to your fork on GitHub
 2. **Settings > Secrets and variables > Actions**
@@ -129,11 +129,18 @@ This runs price updates and alerts automatically - even when your computer is of
 
 4. Go to the **Actions** tab
 5. Click **"I understand my workflows, go ahead and enable them"**
-6. Done! The following will now run automatically:
-   - **Stock Updater** (`update_stocks.yml`): Updates prices every 30 min
-   - **Price Tracker** (`tracker.yml`): Price alerts every 10 min during market hours
+6. Done! The **Stock Updater** (`update_stocks.yml`) automatically updates prices every 30 min.
 
-You will receive:
+### Optional: Price Alerts
+
+For automatic price alerts (Telegram notifications on big moves):
+
+```bash
+# Copy template and add your stocks
+cp tracker_check_template.py tracker_check.py
+```
+
+Edit `tracker_check.py` and add your symbols + alert levels. Then `tracker.yml` will automatically send:
 - Hourly summaries (silent)
 - Instant alerts on big moves (>1.5% in 5 min)
 - Alerts when important price levels are reached
@@ -202,6 +209,6 @@ Yes! `python3 admin_stocks.py add TSLA "Tesla" "Automotive"` - you are the admin
 
 **How do I update the code?**
 ```bash
-git remote add upstream https://github.com/ORIGINAL_ADMIN/NotifyMeClaude.git
+git remote add upstream https://github.com/AbdullahKaratas/NotifyMeClaude.git
 git pull upstream main
 ```

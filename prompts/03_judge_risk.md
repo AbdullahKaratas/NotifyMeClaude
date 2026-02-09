@@ -38,6 +38,7 @@ Analysiere die Bull vs Bear Argumente aus Schritt 2:
 | 🐂 Bull | X/10 | [Top 2 Argumente] |
 | 🐻 Bear | X/10 | [Top 2 Argumente] |
 | 📊 Chart | X/10 | [Was sagt der Chart?] |
+| 🩳 Short Interest | X% Float / X Tage | [Squeeze-Potential oder bearishes Signal?] |
 
 **Entscheidende Faktoren:**
 1. [Wichtigster Faktor]

@@ -5,18 +5,18 @@
 -- https://supabase.com/dashboard/project/YOUR_PROJECT/sql
 -- ============================================================
 
--- Create the reminders table
+-- Reminders table (for analysis results)
 CREATE TABLE IF NOT EXISTS reminders (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     title TEXT NOT NULL,
     description TEXT,
+    image_url TEXT,
     due_at TIMESTAMPTZ NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     is_done BOOLEAN DEFAULT FALSE
 );
 
 -- Enable Realtime for the reminders table
--- This allows the Flutter app to receive live updates
 ALTER TABLE reminders REPLICA IDENTITY FULL;
 
 -- Enable Row Level Security (RLS)
@@ -30,7 +30,6 @@ CREATE POLICY "Allow all for anon on reminders" ON reminders
     USING (true)
     WITH CHECK (true);
 
--- Optional: Create an index for faster queries
 CREATE INDEX IF NOT EXISTS idx_reminders_due_at ON reminders(due_at);
 CREATE INDEX IF NOT EXISTS idx_reminders_is_done ON reminders(is_done);
 
@@ -69,8 +68,26 @@ CREATE INDEX IF NOT EXISTS idx_stocks_is_active ON stocks(is_active);
 CREATE INDEX IF NOT EXISTS idx_stocks_sector ON stocks(sector);
 
 -- ============================================================
--- IMPORTANT: Enable Realtime in Supabase Dashboard
+-- Tracker State (for price alert persistence in GitHub Actions)
 -- ============================================================
--- 1. Go to Database > Replication
--- 2. Enable replication for the "reminders" table
+
+CREATE TABLE IF NOT EXISTS tracker_state (
+    key TEXT PRIMARY KEY,
+    value JSONB NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE tracker_state ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow all for anon on tracker_state" ON tracker_state
+    FOR ALL
+    USING (true)
+    WITH CHECK (true);
+
+-- ============================================================
+-- Storage: Create a "charts" bucket in Supabase Dashboard
+-- ============================================================
+-- 1. Go to Storage > New Bucket
+-- 2. Name: "charts"
+-- 3. Public: ON
 -- ============================================================
