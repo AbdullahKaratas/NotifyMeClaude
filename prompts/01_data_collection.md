@@ -15,6 +15,7 @@
 ║  ✅ CHART GENERIEREN: Visuell den Chart analysieren!         ║
 ║  ✅ ECHTE News: Mit Datum, Quelle und Link                   ║
 ║  ✅ Web-Suche: NUR für News und aktuelle Events              ║
+║  ✅ KORRELATION: Bestehende Positionen pruefen!              ║
 ║                                                               ║
 ║  ❌ NICHT Web-Suche für Preisdaten nutzen (veraltet!)        ║
 ║  ❌ KEINE erfundenen Daten oder Schätzungen ohne Quelle      ║
@@ -133,6 +134,18 @@ print(f'  Beta:               {beta}')
 print()
 print('⚠️ RISK SCORES')
 print(f'  Overall Risk:       {info.get("overallRisk", "N/A")}/10')
+print()
+
+# EARNINGS-KALENDER
+print('📅 EARNINGS & EVENTS')
+try:
+    cal = ticker.calendar
+    if cal is not None and len(cal) > 0:
+        print(f'  Naechste Earnings:  {cal}')
+    else:
+        print('  Naechste Earnings:  Keine Daten verfuegbar')
+except:
+    print('  Naechste Earnings:  Keine Daten verfuegbar')
 ```
 
 **WICHTIG:**
@@ -144,10 +157,14 @@ print(f'  Overall Risk:       {info.get("overallRisk", "N/A")}/10')
 
 ## 1.1 CHART GENERIEREN & ANALYSIEREN (PFLICHT!)
 
-**Lies die Pfade aus `.env` und fuehre aus:**
+**Führe diesen Befehl aus (nutze Pfade aus `.env`):**
 
 ```bash
-source .env && $YFINANCE_VENV $CHART_SCRIPT {{SYMBOL}}
+source .env 2>/dev/null
+VENV="${YFINANCE_VENV:-python3}"
+SCRIPT="${CHART_SCRIPT:-scripts/generate_chart.py}"
+OUTPUT="${CHART_OUTPUT_DIR:-charts}"
+$VENV $SCRIPT {{SYMBOL}}
 ```
 
 **Dann lies den Chart:**
@@ -244,6 +261,15 @@ Dokumentiere was du im Chart siehst:
 
 ATR wird in Schritt 3 fuer die KO-Berechnung genutzt. Hier nur den Wert dokumentieren.
 
+**Volatilitaets-Einordnung:**
+
+| ATR % | Einordnung | Bedeutung fuer Turbos |
+|-------|------------|----------------------|
+| < 2% | Niedrig | Enger KO moeglich, aber wenig Bewegung |
+| 2-4% | Mittel | Standard-Turbos gut geeignet |
+| 4-7% | Hoch | Weiter KO noetig, hoeheres Risiko |
+| > 7% | Sehr hoch | Nur mit kleiner Position, weiter KO PFLICHT |
+
 ---
 
 ## 1.7 News & Katalysatoren
@@ -295,23 +321,53 @@ Suchquellen:
 
 ---
 
-## 1.10 KORRELATIONS-CHECK
-
-**Lies offene Positionen aus der Supabase `portfolio` Tabelle (status = 'open').**
-
-| Pruefpunkt | Ergebnis |
-|------------|----------|
-| Bestehende Positionen im gleichen Sektor | [Welche?] |
-| Sektor-Konzentration | [X% im gleichen Sektor] |
-| Richtungs-Korrelation | [Alle LONG? Alle Tech/AI?] |
+## 1.10 KORRELATIONS-CHECK (PFLICHT!)
 
 ```
-⚠️ WARNUNG wenn:
-- > 60% des Portfolios im gleichen Sektor
-- > 3 Positionen gleiche Richtung + gleicher Sektor
-- Neuer Trade wuerde Klumpenrisiko erhoehen
-→ In der Analyse explizit erwaehnen!
+╔═══════════════════════════════════════════════════════════════╗
+║  BEVOR ein neuer Trade eroeffnet wird:                       ║
+║  Pruefe Korrelation zu bestehenden Positionen!               ║
+║                                                               ║
+║  → Lies offene Positionen aus Supabase `portfolio` Tabelle   ║
+║  → Bestimme Sektor-Konzentration                             ║
+║  → Wenn >60% in einem Sektor: WARNUNG ausgeben!              ║
+╚═══════════════════════════════════════════════════════════════╝
 ```
+
+**Bestehende offene Positionen (aus Supabase):**
+
+| Symbol | Sektor | Richtung | Groesse (EUR) |
+|--------|--------|----------|---------------|
+| [aus DB] | [Sektor] | LONG/SHORT | XXX EUR |
+| [aus DB] | [Sektor] | LONG/SHORT | XXX EUR |
+
+**Korrelations-Bewertung:**
+
+| Pruefung | Ergebnis | Status |
+|----------|----------|--------|
+| Gleicher Sektor wie {{SYMBOL}}? | [Ja/Nein - welche?] | ✅/⚠️ |
+| Gleiche Richtung (alle LONG)? | [Ja/Nein] | ✅/⚠️ |
+| Sektor-Konzentration | XX% in [Sektor] | ✅ <60% / ⚠️ >60% |
+| Korreliert mit Nasdaq/S&P? | [Hoch/Mittel/Niedrig] | ✅/⚠️ |
+
+**Wenn ⚠️ WARNUNG:**
+> Hohe Korrelation erkannt! Bei einem Nasdaq-Einbruch von 3% wuerden ALLE Positionen gleichzeitig bluten. Erwaege: kleinere Positionsgroesse, SHORT-Hedge, oder unkorrelierten Trade (Gold, Short-Turbo auf Index).
+
+---
+
+## 1.11 EVENT-KALENDER
+
+**Kommende Events die {{SYMBOL}} bewegen koennten:**
+
+| Datum | Event | Erwarteter Impact | Relevanz |
+|-------|-------|-------------------|----------|
+| [Datum] | Earnings {{SYMBOL}} | 🔴🔴🔴 Hoch | Direkt |
+| [Datum] | Fed Meeting / FOMC | 🔴🔴 Mittel-Hoch | Makro |
+| [Datum] | CPI-Daten | 🔴 Mittel | Makro |
+| [Datum] | Earnings [Peer] | 🟡 Niedrig-Mittel | Sektor |
+| [Datum] | [Anderes Event] | [Impact] | [Relevanz] |
+
+**⚠️ EARNINGS-WARNUNG:** Wenn {{SYMBOL}} Earnings < 5 Handelstage entfernt sind, wird dies in Schritt 3 bei der KO-Berechnung beruecksichtigt (erhoehter ATR-Multiplikator).
 
 ---
 
@@ -323,7 +379,8 @@ Suchquellen:
 - ✅ Keine Web-Suche fuer Preisdaten
 - ✅ Jeder Datenpunkt mit Quelle
 - ✅ Mindestens 5 News-Headlines mit Datum
-- ✅ Korrelations-Check gegen bestehende Positionen
+- ✅ Korrelations-Check gegen bestehende Positionen (PFLICHT!)
+- ✅ Event-Kalender mit Earnings und Makro-Terminen
 
 ```
 ✅ [SCHRITT 1: DATENSAMMLUNG ABGESCHLOSSEN]

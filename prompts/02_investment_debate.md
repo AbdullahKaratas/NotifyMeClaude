@@ -16,10 +16,11 @@
 ║  ✅ Bear MUSS Bull-Argumente explizit widerlegen             ║
 ║  ✅ Kursziel mit Begründung (Chart-Level referenzieren)      ║
 ║  ✅ 2 vollständige Runden (nicht abkürzen!)                  ║
+║  ✅ SHORT-Trade Bewertung am Ende (PFLICHT!)                 ║
 ║                                                               ║
 ║  ❌ NICHT 1-2 Satz Argumente schreiben                       ║
 ║  ❌ NICHT die Debate als Formalität behandeln                ║
-║  ❌ NICHT schnell durchklicken oder Template ausfüllen       ║
+║  ❌ NICHT automatisch LONG bevorzugen - sei NEUTRAL!         ║
 ║                                                               ║
 ║  Wenn du merkst dass du abkürzt → STOPP → Mach es richtig!  ║
 ║                                                               ║
@@ -182,19 +183,52 @@
 
 ## SHORT-TRADE BEWERTUNG
 
-Nach Abschluss der Debate: Waere ein SHORT-Trade hier attraktiver als LONG?
+```
+╔═══════════════════════════════════════════════════════════════╗
+║  PFLICHT: Bewerte ob ein SHORT-Trade attraktiver waere!      ║
+║                                                               ║
+║  Das System darf NICHT nur LONG-Signale produzieren.         ║
+║  Geld verdienen geht in beide Richtungen.                    ║
+║                                                               ║
+║  Trade Republic hat Long UND Short Turbos!                   ║
+╚═══════════════════════════════════════════════════════════════╝
+```
 
-| Pruefpunkt | Ergebnis |
-|------------|----------|
-| Bear-Argumente Staerke | [X/10] |
-| Technische Short-Signale | [RSI ueberkauft? Death Cross? Distribution?] |
-| Katalysator fuer Downside | [Welcher?] |
+### LONG vs SHORT Scorecard
+
+| Kriterium | LONG Score (0-10) | SHORT Score (0-10) |
+|-----------|-------------------|---------------------|
+| Technische Signale | X/10 | X/10 |
+| News-Momentum | X/10 | X/10 |
+| Fundamentals | X/10 | X/10 |
+| Makro-Umfeld | X/10 | X/10 |
+| Chart-Pattern | X/10 | X/10 |
+| Risk/Reward | X/10 | X/10 |
+| **GESAMT** | **XX/60** | **XX/60** |
+
+### Empfehlung
 
 ```
-REGEL:
-- Wenn Bear-Argumente >= 7/10: SHORT-Setup separat ausarbeiten
-- Wenn LONG-Konfidenz < 55%: SHORT als Alternative pruefen
-- Ergebnis wird in Schritt 3 (Judge) beruecksichtigt
+LONG Score:  XX/60
+SHORT Score: XX/60
+Differenz:   XX Punkte zugunsten [LONG/SHORT]
+```
+
+**Wenn SHORT Score > LONG Score ODER Differenz < 5 Punkte:**
+> Erarbeite ein konkretes SHORT-Setup:
+> - SHORT Entry: $XX.XX (welches Resistance-Level?)
+> - SHORT KO: $XX.XX (ueber welchem Widerstand?)
+> - SHORT Target: $XX.XX (welcher Support?)
+> - Warum SHORT hier besser ist: [2-3 Saetze]
+
+**Wenn LONG klar besser (Differenz > 10 Punkte):**
+> LONG bestaetigt. Weiter mit Schritt 3 als LONG-Trade.
+
+**Wenn unklar (Differenz 5-10 Punkte):**
+> Beide Setups in Schritt 3 ausarbeiten. Judge entscheidet.
+
+```
+✅ [SHORT-TRADE BEWERTUNG ABGESCHLOSSEN]
 ```
 
 ---
@@ -207,7 +241,8 @@ REGEL:
 - ✅ Kursziel mit Begruendung (Chart-Level referenzieren)
 - ✅ 2 vollstaendige Runden durchgefuehrt
 - ✅ Keine generischen Aussagen - nur konkrete Daten
-- ✅ SHORT-Trade Bewertung durchgefuehrt
+- ✅ SHORT-Trade Scorecard ausgefuellt
+- ✅ SHORT-Setup ausgearbeitet wenn Score es verlangt
 
 ```
 ✅ [SCHRITT 2: INVESTMENT DEBATE ABGESCHLOSSEN]
