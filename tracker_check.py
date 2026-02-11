@@ -19,11 +19,11 @@ API = f'https://api.telegram.org/bot{TOKEN}'
 SYMBOLS = {
     'SI=F': {'name': 'Silber', 'emoji': '🥈'},
     'AAPL': {'name': 'Apple', 'emoji': '🍎'},
-    'QBTS': {'name': 'D-Wave', 'emoji': '⚛️'},
+    'APLD': {'name': 'Applied Digital', 'emoji': '⚡'},
     'WDC':  {'name': 'Western Digital', 'emoji': '💾'},
     'GOOGL': {'name': 'Alphabet', 'emoji': '🔍'},
     'RKLB': {'name': 'Rocket Lab', 'emoji': '🚀'},
-    'VST':  {'name': 'Vistra Energy', 'emoji': '⚡'},
+    'VST':  {'name': 'Vistra Energy', 'emoji': '🔋'},
     'GC=F': {'name': 'Gold', 'emoji': '🥇'},
     'IREN': {'name': 'IREN', 'emoji': '🔥'},
     'ARM':  {'name': 'ARM Holdings', 'emoji': '🧠'},
@@ -38,9 +38,9 @@ ALERT_RULES = {
         'above': [92, 95, 100],
         'below': [85, 82, 80, 79],
     },
-    'QBTS': {
-        'above': [25, 30],
-        'below': [18, 15],
+    'APLD': {
+        'above': [42, 48, 55],
+        'below': [35, 31, 28],
     },
     'AAPL': {
         'above': [290, 300],
@@ -121,18 +121,22 @@ TRADING_ZONES = {
              'note': 'GEFAHR! Nur noch 7% ueber KO ($233.87). Sofort raus wenn noch nicht geschehen.'},
         ],
     },
-    'QBTS': {
-        'bias': 'WATCH',
-        'context': 'Position geschlossen mit -97 EUR. Quantum-Hype volatil. Nur mit klarem Setup wieder rein.',
+    'APLD': {
+        'bias': 'LONG',
+        'context': 'POSITION OFFEN: 95x Turbo KO ~$31. Entry 0.701 EUR. Golden Cross, V-Shape Recovery $27→$37. Short Interest 33.7%! $16B Contracts. Exits: $42(30%), $48(40%), $55(Rest). Updated 11.02.2026.',
         'zones': [
-            {'type': 'BUY', 'price': 15, 'dir': 'below',
-             'note': 'Kaufzone für Swing-Trade. Aber nur kleine Position, max 100 EUR.'},
-            {'type': 'WATCH', 'price': 18, 'dir': 'below',
-             'note': 'Unter $18 wird es interessant. Abwarten auf Bodenbildung.'},
-            {'type': 'SELL', 'price': 25, 'dir': 'above',
-             'note': 'Wenn Long: Gewinne mitnehmen. Quantum-Aktien übertreiben in beide Richtungen.'},
-            {'type': 'SELL', 'price': 30, 'dir': 'above',
-             'note': 'Starker Widerstand. Hier wird regelmäßig abverkauft.'},
+            {'type': 'SELL', 'price': 42, 'dir': 'above',
+             'note': 'Exit 1! Gap-Fill Zone. 30% Position verkaufen. Stop auf Entry nachziehen.'},
+            {'type': 'SELL', 'price': 48, 'dir': 'above',
+             'note': 'Exit 2! Short Squeeze Zone. 40% verkaufen. Cert ~3x vom Entry!'},
+            {'type': 'SELL', 'price': 55, 'dir': 'above',
+             'note': 'JACKPOT! ATH Retest. Rest verkaufen und feiern!'},
+            {'type': 'WATCH', 'price': 35, 'dir': 'below',
+             'note': 'Support-Test! V-Recovery Trendlinie. Wenn bricht = These wackelt.'},
+            {'type': 'STOP', 'price': 31, 'dir': 'below',
+             'note': 'KO-ZONE! Turbo wird wertlos unter ~$31. SOFORT raus wenn noch nicht passiert!'},
+            {'type': 'DANGER', 'price': 28, 'dir': 'below',
+             'note': 'GEFAHR! Unter Crash-Tief $27.62. Alles verloren.'},
         ],
     },
     'WDC': {
@@ -353,11 +357,20 @@ def load_state():
     """Load tracker state from Supabase."""
     result = supabase_request('GET', 'tracker_state?select=key,value')
     if not result:
+        print('  [state: empty or error, starting fresh]')
         return {}, set(), -1
     state = {row['key']: row['value'] for row in result}
     prev_prices = state.get('prev_prices', {})
-    alerted_levels = set(state.get('alerted_levels', []))
+    alerted_raw = state.get('alerted_levels', [])
+    # Clean up daily alerts at market open (14:30 UTC = US open)
+    now = datetime.now(timezone.utc)
+    if now.hour == 14 and now.minute < 15:
+        # Reset daily move alerts at US market open
+        alerted_raw = [k for k in alerted_raw if '_daily_' not in k]
+        print('  [state: daily alerts reset for new trading day]')
+    alerted_levels = set(alerted_raw)
     last_summary_hour = state.get('last_summary_hour', -1)
+    print(f'  [state loaded: {len(prev_prices)} prices, {len(alerted_levels)} alerts]')
     return prev_prices, alerted_levels, last_summary_hour
 
 
@@ -467,7 +480,8 @@ def get_zone_status(sym, price):
 # ── Alert Logic ──
 
 def check_alerts(prices, prev_prices, alerted_levels):
-    """Check all alert conditions. Returns list of alert messages."""
+    """Check all alert conditions. Returns list of alert messages.
+    Skips stale prices (unchanged from last check = market closed)."""
     alerts = []
 
     for sym, meta in SYMBOLS.items():
@@ -478,20 +492,24 @@ def check_alerts(prices, prev_prices, alerted_levels):
         price = data['price']
         change = data['change_pct']
 
-        # Flash move (vs previous check)
-        if sym in prev_prices and prev_prices[sym] > 0:
-            move = ((price / prev_prices[sym]) - 1) * 100
+        # Skip stale prices - if price identical to last check, market is closed
+        prev = prev_prices.get(sym, 0)
+        price_is_stale = (prev > 0 and abs(price - prev) < 0.001)
+
+        # Flash move (vs previous check) - only on fresh prices
+        if not price_is_stale and prev > 0:
+            move = ((price / prev) - 1) * 100
             if abs(move) >= ALERT_RULES['flash_move_pct']:
                 direction = '📈 SPIKE' if move > 0 else '📉 DROP'
                 alerts.append({
                     'text': (f'⚡ <b>{direction}: {meta["emoji"]} {meta["name"]}</b>\n'
-                             f'${price:.2f} ({move:+.1f}% in 5 Min!)\n'
+                             f'${price:.2f} ({move:+.1f}% in ~10 Min!)\n'
                              f'Tageschange: {change:+.1f}%'),
                     'silent': False,
                 })
 
-        # Price level crossings with AI context
-        if sym in ALERT_RULES:
+        # Price level crossings - SKIP if price is stale (no re-alerting on closed market)
+        if sym in ALERT_RULES and not price_is_stale:
             levels = ALERT_RULES[sym]
             for lvl in levels.get('above', []):
                 key = f'{sym}_above_{lvl}'
@@ -516,19 +534,20 @@ def check_alerts(prices, prev_prices, alerted_levels):
                         text += f'\n\n🤖 <i>{zone_note}</i>'
                     alerts.append({'text': text, 'silent': False})
 
-        # Big daily move
-        threshold = ALERT_RULES['big_daily_move_pct']
-        for t in [threshold, threshold * 2, threshold * 3]:
-            key = f'{sym}_daily_{int(t)}'
-            if abs(change) >= t and key not in alerted_levels:
-                alerted_levels.add(key)
-                emoji = '🟢' if change > 0 else '🔴'
-                alerts.append({
-                    'text': (f'{emoji} <b>{meta["emoji"]} {meta["name"]}: {change:+.1f}% heute!</b>\n'
-                             f'Aktuell: ${price:.2f}\n'
-                             f'Range: ${data["day_low"]:.2f} - ${data["day_high"]:.2f}'),
-                    'silent': False,
-                })
+        # Big daily move - only alert once per threshold per day
+        if not price_is_stale:
+            threshold = ALERT_RULES['big_daily_move_pct']
+            for t in [threshold, threshold * 2, threshold * 3]:
+                key = f'{sym}_daily_{int(t)}'
+                if abs(change) >= t and key not in alerted_levels:
+                    alerted_levels.add(key)
+                    emoji = '🟢' if change > 0 else '🔴'
+                    alerts.append({
+                        'text': (f'{emoji} <b>{meta["emoji"]} {meta["name"]}: {change:+.1f}% heute!</b>\n'
+                                 f'Aktuell: ${price:.2f}\n'
+                                 f'Range: ${data["day_low"]:.2f} - ${data["day_high"]:.2f}'),
+                        'silent': False,
+                    })
 
     return alerts
 
@@ -577,8 +596,8 @@ def main():
         send_telegram(alert['text'], silent=alert['silent'])
         print(f'  ALERT SENT: {alert["text"][:60]}...')
 
-    # Hourly summary
-    if hour != last_summary_hour and now.minute < 35:
+    # Summary every 2 hours (even hours only) to reduce notification spam
+    if hour % 2 == 0 and hour != last_summary_hour and now.minute < 35:
         msg = format_summary(prices, prev_prices)
         send_telegram(msg, silent=True)
         last_summary_hour = hour
