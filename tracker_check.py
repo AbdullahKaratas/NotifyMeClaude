@@ -454,33 +454,13 @@ def get_zone_context(sym, price_level, direction):
     return None
 
 
-def get_zone_status(sym, price):
-    """Get current zone status for a symbol in hourly summary."""
-    if sym not in TRADING_ZONES:
-        return ''
-    zones = TRADING_ZONES[sym]
-    # Find nearest zone
-    nearest = None
-    nearest_dist = float('inf')
-    for zone in zones['zones']:
-        dist = abs(price - zone['price'])
-        if dist < nearest_dist:
-            nearest_dist = dist
-            nearest = zone
-    if not nearest:
-        return ''
-    pct_away = ((nearest['price'] - price) / price) * 100
-    if abs(pct_away) < 1:
-        return f' ⬅️ {nearest["type"]} Zone!'
-    elif abs(pct_away) < 5:
-        return f' ({abs(pct_away):.1f}% bis {nearest["type"]} ${nearest["price"]})'
-    return ''
 
 
 # ── Alert Logic ──
 
 def check_alerts(prices, prev_prices, alerted_levels):
     """Check all alert conditions. Returns list of alert messages.
+    Groups multiple level crossings per symbol into ONE message.
     Skips stale prices (unchanged from last check = market closed)."""
     alerts = []
 
@@ -508,7 +488,8 @@ def check_alerts(prices, prev_prices, alerted_levels):
                     'silent': False,
                 })
 
-        # Price level crossings - SKIP if price is stale (no re-alerting on closed market)
+        # Price level crossings - grouped per symbol
+        level_lines = []
         if sym in ALERT_RULES and not price_is_stale:
             levels = ALERT_RULES[sym]
             for lvl in levels.get('above', []):
@@ -517,22 +498,29 @@ def check_alerts(prices, prev_prices, alerted_levels):
                     alerted_levels.add(key)
                     alerted_levels.discard(f'{sym}_below_{lvl}')
                     zone_note = get_zone_context(sym, lvl, 'above')
-                    text = f'🚨 <b>{meta["emoji"]} {meta["name"]} ÜBER ${lvl}!</b>\n'
-                    text += f'Aktuell: ${price:.2f} ({change:+.1f}%)'
+                    line = f'  ÜBER ${lvl}'
                     if zone_note:
-                        text += f'\n\n🤖 <i>{zone_note}</i>'
-                    alerts.append({'text': text, 'silent': False})
+                        line += f' - {zone_note}'
+                    level_lines.append(line)
             for lvl in levels.get('below', []):
                 key = f'{sym}_below_{lvl}'
                 if price <= lvl and key not in alerted_levels:
                     alerted_levels.add(key)
                     alerted_levels.discard(f'{sym}_above_{lvl}')
                     zone_note = get_zone_context(sym, lvl, 'below')
-                    text = f'🚨 <b>{meta["emoji"]} {meta["name"]} UNTER ${lvl}!</b>\n'
-                    text += f'Aktuell: ${price:.2f} ({change:+.1f}%)'
+                    line = f'  UNTER ${lvl}'
                     if zone_note:
-                        text += f'\n\n🤖 <i>{zone_note}</i>'
-                    alerts.append({'text': text, 'silent': False})
+                        line += f' - {zone_note}'
+                    level_lines.append(line)
+
+        # Send ONE combined message per symbol for level crossings
+        if level_lines:
+            n = len(level_lines)
+            label = 'Level gekreuzt' if n == 1 else f'{n} Levels gekreuzt'
+            text = f'🚨 <b>{meta["emoji"]} {meta["name"]} - {label}!</b>\n'
+            text += f'Aktuell: ${price:.2f} ({change:+.1f}%)\n\n'
+            text += '\n'.join(level_lines)
+            alerts.append({'text': text, 'silent': False})
 
         # Big daily move - only alert once per threshold per day
         if not price_is_stale:
@@ -552,29 +540,6 @@ def check_alerts(prices, prev_prices, alerted_levels):
     return alerts
 
 
-def format_summary(prices, prev_prices):
-    """Format a quiet hourly summary."""
-    now = datetime.now(timezone.utc).strftime('%H:%M')
-    lines = [f'🦅 <b>Stündliches Update</b> | {now} UTC', '']
-
-    for sym, meta in SYMBOLS.items():
-        data = prices.get(sym, {})
-        if 'error' in data:
-            continue
-        price = data['price']
-        change = data['change_pct']
-        arrow = '🟢' if change > 0.5 else '🔴' if change < -0.5 else '⚪'
-
-        move_txt = ''
-        if sym in prev_prices and prev_prices[sym] > 0:
-            move = ((price / prev_prices[sym]) - 1) * 100
-            if abs(move) > 0.1:
-                move_txt = f' ({"↑" if move > 0 else "↓"}{abs(move):.1f}%/5m)'
-
-        zone_txt = get_zone_status(sym, price)
-        lines.append(f'{arrow} {meta["emoji"]} <b>{meta["name"]}</b>: ${price:.2f} ({change:+.1f}%){move_txt}{zone_txt}')
-
-    return '\n'.join(lines)
 
 
 # ── Main ──
@@ -595,13 +560,6 @@ def main():
     for alert in alerts:
         send_telegram(alert['text'], silent=alert['silent'])
         print(f'  ALERT SENT: {alert["text"][:60]}...')
-
-    # Summary every 2 hours (even hours only) to reduce notification spam
-    if hour % 2 == 0 and hour != last_summary_hour and now.minute < 35:
-        msg = format_summary(prices, prev_prices)
-        send_telegram(msg, silent=True)
-        last_summary_hour = hour
-        print(f'  [summary sent]')
 
     # Update prev_prices
     for sym, data in prices.items():
