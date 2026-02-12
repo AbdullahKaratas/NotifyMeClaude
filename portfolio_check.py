@@ -40,8 +40,8 @@ def fetch_yfinance_data(symbols):
 
             if len(hist) >= 14:
                 delta = hist['Close'].diff()
-                gain = delta.where(delta > 0, 0).rolling(window=14).mean()
-                loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
+                gain = delta.where(delta > 0, 0).ewm(alpha=1/14, min_periods=14).mean()
+                loss = (-delta.where(delta < 0, 0)).ewm(alpha=1/14, min_periods=14).mean()
                 rs = gain / loss
                 rsi_val = float((100 - (100 / (1 + rs))).iloc[-1])
                 if not np.isnan(rsi_val):

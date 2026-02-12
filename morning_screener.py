@@ -216,10 +216,10 @@ def calc_technicals(batch_data, symbols, single=False):
             prev = float(close.iloc[-2]) if len(close) >= 2 else price
             change_pct = round((price - prev) / prev * 100, 2)
 
-            # ── RSI 14 + series for delta/divergence ──
+            # ── RSI 14 (Wilder's smoothing) + series for delta/divergence ──
             delta = close.diff()
-            gain = delta.where(delta > 0, 0).rolling(14).mean()
-            loss_s = (-delta.where(delta < 0, 0)).rolling(14).mean()
+            gain = delta.where(delta > 0, 0).ewm(alpha=1/14, min_periods=14).mean()
+            loss_s = (-delta.where(delta < 0, 0)).ewm(alpha=1/14, min_periods=14).mean()
             rs = gain / loss_s
             rsi_series = 100 - (100 / (1 + rs))
             rsi_val = float(rsi_series.iloc[-1])

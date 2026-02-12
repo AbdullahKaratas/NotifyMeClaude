@@ -72,8 +72,8 @@ def enrich_with_yfinance(tickers):
             rsi = None
             if len(hist) >= 14:
                 delta = hist['Close'].diff()
-                gain = delta.where(delta > 0, 0).rolling(14).mean().iloc[-1]
-                loss = (-delta.where(delta < 0, 0)).rolling(14).mean().iloc[-1]
+                gain = delta.where(delta > 0, 0).ewm(alpha=1/14, min_periods=14).mean().iloc[-1]
+                loss = (-delta.where(delta < 0, 0)).ewm(alpha=1/14, min_periods=14).mean().iloc[-1]
                 if loss > 0:
                     rsi = 100 - (100 / (1 + gain / loss))
 
