@@ -1,0 +1,31 @@
+name: Silver Hawk Morning Screener
+
+on:
+  schedule:
+    # 08:00 CET = 07:00 UTC (Before market open, weekdays)
+    - cron: '0 7 * * 1-5'
+  workflow_dispatch: # Manual trigger
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install yfinance numpy
+
+      - name: Run morning screener
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python morning_screener.py
