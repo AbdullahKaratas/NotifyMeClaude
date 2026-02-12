@@ -18,6 +18,7 @@ from supabase_client import supabase_request
 # ── Config ──
 FUTURES = {'SI=F', 'GC=F'}
 MIN_VOLUME = 100_000
+MIN_SCORE = 25
 TOP_N = 5
 ENRICH_N = 10
 SECTOR_LIMIT = 0.60
@@ -283,8 +284,12 @@ def calc_technicals(batch_data, symbols, single=False):
             sma50_dist = round((price - sma50) / sma50 * 100, 2) if sma50 else None
 
             # ── Volume (directional) ──
+            # Use last complete trading day if current day has partial volume
             avg_vol = int(volume.tail(20).mean()) if len(volume) >= 20 else 0
             vol_today = int(volume.iloc[-1]) if len(volume) > 0 else 0
+            # If vol_today is suspiciously low (<10% of avg), likely partial day -> use previous
+            if avg_vol > 0 and vol_today < avg_vol * 0.1 and len(volume) >= 2:
+                vol_today = int(volume.iloc[-2])
             vol_ratio = round(vol_today / avg_vol, 2) if avg_vol > 0 else 0
 
             # ── Bollinger Bands ──
@@ -435,6 +440,9 @@ def score_long(d):
             score += 6
         elif dist200 > 20:
             score += 3
+        elif dist200 < 0 and rsi < 35:
+            # Reversal-Play: under SMA200 but oversold = bounce potential
+            score += 4; signals.append('Reversal unter SMA200')
 
     # SMA50 timing + distance (0-10)
     dist50 = d.get('sma50_distance_pct')
@@ -446,6 +454,9 @@ def score_long(d):
             score += 7
         elif dist50 > 3:
             score += 3
+    elif dist50 is not None and rsi < 35 and dist50 < -5:
+        # Deep oversold below both SMAs = potential reversal
+        score += 3
 
     # MACD crossover (0-8) + histogram direction (0-5) = 0-13
     mc = d.get('macd_hist')
@@ -488,12 +499,15 @@ def score_long(d):
     elif vr >= 3.0 and chg < -2:
         score -= 3
 
-    # Bollinger squeeze (0-5)
+    # Bollinger squeeze (0-5) + ADX combo bonus (+3)
     bb_pct = d.get('bb_width_percentile')
     bb_pos = d.get('bb_position')
     if bb_pct is not None and bb_pos is not None:
         if bb_pct < 20 and bb_pos < 0.3:
             score += 5; signals.append('BB Squeeze')
+            # Combo: squeeze + trending + RSI delta bullish = breakout imminent
+            if adx and adx >= 25 and rd and rd > 0:
+                score += 3; signals.append('Breakout-Setup')
         elif bb_pct < 20:
             score += 3
 
@@ -604,14 +618,12 @@ def score_short(d):
     mc = d.get('macd_hist')
     mp = d.get('macd_hist_prev')
     m_dir = d.get('macd_hist_direction')
-    m_conv = d.get('macd_converging')
     if mc is not None and mp is not None:
         if mp > 0 and mc < 0:
             score += 8; signals.append('MACD Cross DOWN')
         elif mc < 0:
             score += 4
-        elif m_conv:
-            score += 3
+        # No points for m_conv in SHORT: converging = bearish momentum fading = bullish
         if m_dir == 'decreasing' and mc < 0:
             score += 5
         elif m_dir == 'decreasing':
@@ -641,12 +653,15 @@ def score_short(d):
     elif vr >= 3.0 and chg > 2:
         score -= 3
 
-    # Bollinger squeeze (0-5)
+    # Bollinger squeeze (0-5) + ADX combo bonus (+3)
     bb_pct = d.get('bb_width_percentile')
     bb_pos = d.get('bb_position')
     if bb_pct is not None and bb_pos is not None:
         if bb_pct < 20 and bb_pos > 0.7:
             score += 5; signals.append('BB Squeeze')
+            # Combo: squeeze + trending + RSI delta bearish = breakdown imminent
+            if adx and adx >= 25 and rd and rd < 0:
+                score += 3; signals.append('Breakdown-Setup')
         elif bb_pct < 20:
             score += 3
 
@@ -779,18 +794,18 @@ def build_message(all_data, positions, sector_map, scan_time, total_scanned, pos
             msg += f'  {sec}: {pct:.0f}%{warn}\n'
 
     msg += f'\n<b>TOP LONG</b>\n'
-    if top_long and top_long[0][0] > 0:
+    if top_long and top_long[0][0] >= MIN_SCORE:
         for i, (sc, sym, sec, d, sig) in enumerate(top_long, 1):
-            if sc == 0:
+            if sc < MIN_SCORE:
                 break
             msg += fmt_candidate(i, sc, sym, sec, d, sig, 'LONG', pos_dirs)
     else:
         msg += '  Keine starken Setups\n'
 
     msg += f'\n<b>TOP SHORT</b>\n'
-    if top_short and top_short[0][0] > 0:
+    if top_short and top_short[0][0] >= MIN_SCORE:
         for i, (sc, sym, sec, d, sig) in enumerate(top_short, 1):
-            if sc == 0:
+            if sc < MIN_SCORE:
                 break
             msg += fmt_candidate(i, sc, sym, sec, d, sig, 'SHORT', pos_dirs)
     else:
@@ -803,7 +818,7 @@ def build_message(all_data, positions, sector_map, scan_time, total_scanned, pos
         for date, sym in events[:5]:
             msg += f'  {sym}: Earnings {date}\n'
 
-    msg += f'\nAnalysiere: /analyse-stock SYMBOL'
+    msg += f'\n<i>Score Min: {MIN_SCORE} | Analyse via Claude Code</i>'
     return msg
 
 
@@ -863,12 +878,13 @@ def main():
         print('  No symbols to scan.')
         return
 
-    # Sector map: Wikipedia > watchlist > enrichment
+    # Sector map: Wikipedia > watchlist (portfolio has no sector column)
     sector_map = dict(sp500_sectors)
     for s in watchlist:
         sector_map.setdefault(s['symbol'], s.get('sector', 'Unbekannt'))
-    for p in positions:
-        sector_map.setdefault(p['symbol'], p.get('sector', 'Unbekannt'))
+    # Futures get manual sector assignment
+    sector_map.setdefault('SI=F', 'Commodities')
+    sector_map.setdefault('GC=F', 'Commodities')
 
     # 2. Phase 1: Batch download
     print(f'  Phase 1: Batch downloading {total_scanned} symbols...')
