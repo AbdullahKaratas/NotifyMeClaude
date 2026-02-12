@@ -27,12 +27,12 @@
 ║  Chart-basiert: $XX.XX (unter Support $XX.XX)        ║
 ║  → FINALES KO:  $XX.XX (XX.X% Abstand)              ║
 ║  → Hebel:       ~Xx                                  ║
-║  Stop-Loss:     $XX.XX (mental, ueber KO)            ║
+║  Stop-Loss:     $XX.XX (mental, über KO)              ║
 ║                                                      ║
 ╠══════════════════════════════════════════════════════╣
 ║  POSITIONS-EMPFEHLUNG (% vom Portfolio)              ║
 ╠══════════════════════════════════════════════════════╣
-║  Lotto (5%):       XXX EUR - [Produkt + KO]         ║
+║  Mini (5%):        XXX EUR - [Produkt + KO]          ║
 ║  Klein (15%):      XXX EUR - [Produkt + KO]         ║
 ║  Standard (30%):   XXX EUR - [Produkt + KO]         ║
 ║  Ohne Hebel (20%): XXX EUR - [ETF/ETC/Aktie]        ║
@@ -42,8 +42,8 @@
 ╠══════════════════════════════════════════════════════╣
 ║  EXITS (gestaffelt)                                  ║
 ╠══════════════════════════════════════════════════════╣
-║  Sell 1: $XX.XX (XX%) - [Begruendung]               ║
-║  Sell 2: $XX.XX (XX%) - [Begruendung]               ║
+║  Sell 1: $XX.XX (XX%) - [Begründung]                ║
+║  Sell 2: $XX.XX (XX%) - [Begründung]                ║
 ║  Sell 3: $XX.XX (Rest) - [Stretch-Ziel]             ║
 ║  Time-Stop: X Tage ohne Bewegung → halbieren        ║
 ║                                                      ║
@@ -59,7 +59,7 @@
 ╠══════════════════════════════════════════════════════╣
 ║  Sektor-Konzentration: XX% [Sektor]  [✅/⚠️]       ║
 ║  Offene Positionen gleiche Richtung: X  [✅/⚠️]    ║
-║  Naechstes Event: [Event] am [Datum]  [✅/⚠️]      ║
+║  Nächstes Event: [Event] am [Datum]  [✅/⚠️]       ║
 ║  Risk-Budget verbraucht: XX%  [✅/⚠️]               ║
 ║                                                      ║
 ╠══════════════════════════════════════════════════════╣
@@ -74,7 +74,7 @@
 
 ---
 
-## AUSFUEHRLICHE ANALYSE ({{LANGUAGE}}, 500-800 Woerter)
+## AUSFÜHRLICHE ANALYSE ({{LANGUAGE}}, 500-800 Wörter)
 
 **PFLICHT! Minimum 500 Wörter!**
 
@@ -165,6 +165,27 @@ VALUES (
 
 ---
 
+## VALIDIERUNG VOR VERSAND (PFLICHT!)
+
+Prüfe JEDEN Punkt bevor du sendest. Bei einem ❌ → STOPP und korrigieren!
+
+| # | Check | Kriterium |
+|---|-------|-----------|
+| 1 | Supabase gelesen? | Portfolio-Daten kommen aus DB, nicht aus Memory |
+| 2 | yfinance-Daten? | Preis, ATR, RSI aus yfinance (nicht Web-Suche) |
+| 3 | Stop-Loss vorhanden? | Jeder Trade hat einen Stop (mental oder TR) |
+| 4 | KO berechnet? | KO = MAX(ATR-basiert, Chart-basiert), nicht geschätzt |
+| 5 | SHORT geprüft? | Scorecard ausgefüllt, SHORT-Setup wenn Score >= LONG |
+| 6 | Wechselkurs live? | EUR/USD aus yfinance, nicht hardcodiert |
+| 7 | Positionen in %? | Empfehlungen in % vom Portfolio, nicht feste EUR |
+| 8 | Korrelation OK? | Sektor-Konzentration < 60% nach diesem Trade |
+| 9 | Risk-Budget OK? | Max. 10% Verlust pro Trade, 40% gesamt |
+
+Zeige die Checkliste im Output:
+✅ oder ❌ pro Punkt, mit konkretem Wert.
+
+---
+
 ## TELEGRAM VERSAND (PFLICHT!)
 
 **Sende die Trading Card als Telegram-Nachricht:**
@@ -202,11 +223,11 @@ send_photo('${CHART_OUTPUT_DIR}/{{SYMBOL}}_chart.png', '📊 {{SYMBOL}} Chart')
 ## ENFORCEMENT
 
 - ✅ Trading Card mit allen Key-Facts inkl. KO-Methode und Risiko-Check
-- ✅ Positions-Empfehlung in % vom Portfolio (nicht feste EUR-Betraege)
-- ✅ Minimum 500 Woerter in der Analyse
+- ✅ Positions-Empfehlung in % vom Portfolio (nicht feste EUR-Beträge)
+- ✅ Minimum 500 Wörter in der Analyse
 - ✅ ALLE vorherigen Schritte in der Description
 - ✅ Chart-URL in image_url
-- ✅ SQL INSERT ausfuehren
+- ✅ SQL INSERT ausführen
 - ✅ Telegram-Nachricht mit Trading Card senden (PFLICHT!)
 - ✅ Chart als Telegram-Foto senden
 

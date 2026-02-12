@@ -4,17 +4,17 @@ description: "Run full 4-step multi-agent trading analysis for a stock. Use when
 argument-hint: "<SYMBOL> [LANGUAGE]"
 ---
 
-# 4-Schritt Multi-Agent Trading Analyse fuer $ARGUMENTS
+# 4-Schritt Multi-Agent Trading Analyse für $ARGUMENTS
 
 ## QUALITAETS-ANFORDERUNGEN
 
-- **KEIN Schritt darf uebersprungen werden**
-- **yfinance IMMER zuerst** - keine Web-Suche fuer Preisdaten
+- **KEIN Schritt darf übersprungen werden**
+- **yfinance IMMER zuerst** - keine Web-Suche für Preisdaten
 - **Chart wird von JEDEM Schritt analysiert**
-- **Jedes Argument: 4-6 Saetze mit konkreten Zahlen**
+- **Jedes Argument: 4-6 Sätze mit konkreten Zahlen**
 - **Sprache:** Deutsch (Standard). JSON-Keys Englisch.
 - **LONG und SHORT sind gleichwertig** - kein LONG-Bias!
-- **Wenn du merkst dass du abkuerzt -> STOPP -> Mach es richtig!**
+- **Wenn du merkst dass du abkürzt -> STOPP -> Mach es richtig!**
 
 ## RISK MANAGEMENT (IMMER BEACHTEN!)
 
@@ -24,18 +24,24 @@ argument-hint: "<SYMBOL> [LANGUAGE]"
 ║  Max. gleichzeitig riskiert:  40% des Portfolios             ║
 ║  Max. Sektor-Konzentration:   60% in einem Sektor            ║
 ║  Time-Stop: 5 Tage kein +5% → halbieren, 8 Tage → raus     ║
-║  Vor Earnings: min. 50% sichern oder KO-Abstand erhoehen    ║
+║  Vor Earnings: min. 50% sichern oder KO-Abstand erhöhen     ║
 ╚═══════════════════════════════════════════════════════════════╝
 ```
 
 ## ABLAUF
 
-Fuehre die 4 Schritte **nacheinander** aus. Jeder Schritt baut auf den vorherigen auf.
+Führe die 4 Schritte **nacheinander** aus. Jeder Schritt baut auf den vorherigen auf.
+
+### Schritt 0: Portfolio-Sync (PFLICHT - VOR ALLEM ANDEREN!)
+- Lies die Supabase `portfolio` Tabelle (offene Positionen + Cash)
+- Zeige den aktuellen Stand kurz an (Gesamtwert, Cash frei, Sektor-Verteilung)
+- Prüfe Sektor-Konzentration: Wenn der neue Trade den 60%-Limit überschreiten würde → WARNUNG
+- Wenn Supabase-Verbindung fehlschlägt → STOPP, User informieren, NICHT mit geschätzten Daten weiterarbeiten
 
 ### Schritt 1: Datensammlung
-Lies und fuehre aus: `prompts/01_data_collection.md`
+Lies und führe aus: `prompts/01_data_collection.md`
 - Ersetze `{{SYMBOL}}` mit dem Stock-Symbol aus $ARGUMENTS
-- yfinance Python-Script ausfuehren (PFLICHT!)
+- yfinance Python-Script ausführen (PFLICHT!)
 - Chart generieren und visuell analysieren (PFLICHT!)
 - News via Web-Suche (mindestens 5 mit Datum)
 - Makro-Faktoren (Fed, DXY, CPI, Geopolitik)
@@ -44,29 +50,29 @@ Lies und fuehre aus: `prompts/01_data_collection.md`
 - **NEU: Event-Kalender (Earnings, Fed, CPI) mit Impact-Bewertung**
 
 ### Schritt 2: Investment Debate
-Lies und fuehre aus: `prompts/02_investment_debate.md`
+Lies und führe aus: `prompts/02_investment_debate.md`
 - Input: Datenblock + Chart aus Schritt 1
-- 2 vollstaendige Runden Bull vs Bear
+- 2 vollständige Runden Bull vs Bear
 - Konkrete Preisziele pro Seite
-- **NEU: SHORT-Trade Scorecard (LONG vs SHORT, je 0-10 ueber 6 Kriterien)**
+- **NEU: SHORT-Trade Scorecard (LONG vs SHORT, je 0-10 über 6 Kriterien)**
 - **NEU: Wenn SHORT Score >= LONG Score → SHORT-Setup ausarbeiten**
 
 ### Schritt 3: Judge, Risk & Positionierung
-Lies und fuehre aus: `prompts/03_judge_risk.md`
-- Judge bewertet UNABHAENGIG (inkl. Chart!)
+Lies und führe aus: `prompts/03_judge_risk.md`
+- Judge bewertet UNABHÄNGIG (inkl. Chart!)
 - Signal + Konfidenz-Score
 - **NEU: KO-Berechnung in 3 Schritten:**
   - A) ATR-Multiplikator nach Asset-Klasse (Large Cap 2x, Small Cap 2.5x, Rohstoffe 3x)
-  - B) Chart-Support als Mindestabstand (KO unter staerkstem Support + Puffer)
+  - B) Chart-Support als Mindestabstand (KO unter stärkstem Support + Puffer)
   - C) Finales KO = das WEITER ENTFERNTE von A und B
 - **NEU: Earnings/Event-Warnung** (ATR-Multiplikator +0.5 wenn Event < 5 Tage)
 - **NEU: Risk-per-Trade Check** (10% max, 40% gleichzeitig, gegen Portfolio aus Supabase)
 - **NEU: Time-Stops** (5 Tage → halbieren, 8 Tage → raus, vor Earnings → 50% sichern)
-- Positions-Matrix: 4 Szenarien in % vom Portfolio (Lotto 5% / Klein 15% / Standard 30% / Ohne Hebel 20%)
-- Stop-Loss Strategie (mentaler Stop UEBER KO)
+- Positions-Matrix: 4 Szenarien in % vom Portfolio (Mini 5% / Klein 15% / Standard 30% / Ohne Hebel 20%)
+- Stop-Loss Strategie (mentaler Stop ÜBER KO)
 
 ### Schritt 4: Zusammenfassung & Versand
-Lies und fuehre aus: `prompts/04_summary_send.md`
+Lies und führe aus: `prompts/04_summary_send.md`
 - Trading Card erstellen (inkl. Risiko-Check Block und gestaffelte Exits)
 - Chart zu Supabase hochladen
 - Analyse als Reminder in Supabase speichern

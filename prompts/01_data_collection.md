@@ -15,7 +15,7 @@
 ║  ✅ CHART GENERIEREN: Visuell den Chart analysieren!         ║
 ║  ✅ ECHTE News: Mit Datum, Quelle und Link                   ║
 ║  ✅ Web-Suche: NUR für News und aktuelle Events              ║
-║  ✅ KORRELATION: Bestehende Positionen pruefen!              ║
+║  ✅ KORRELATION: Bestehende Positionen prüfen!               ║
 ║                                                               ║
 ║  ❌ NICHT Web-Suche für Preisdaten nutzen (veraltet!)        ║
 ║  ❌ KEINE erfundenen Daten oder Schätzungen ohne Quelle      ║
@@ -122,14 +122,14 @@ print(f'  Target Mean:        ${info.get("targetMeanPrice", 0):.0f}')
 print(f'  Target Low:         ${info.get("targetLowPrice", 0):.0f}')
 print(f'  Recommendation:     {info.get("recommendationKey", "N/A").upper()}')
 print()
-print('📐 VOLATILITAET')
+print('📐 VOLATILITÄT')
 atr_data = hist['High'] - hist['Low']
 atr14 = atr_data.rolling(14).mean().iloc[-1]
 atr_pct = (atr14 / price) * 100
 ann_vol = hist['Close'].pct_change().std() * (252**0.5) * 100
 beta = info.get('beta', 'N/A')
 print(f'  ATR (14):           ${atr14:.2f} ({atr_pct:.1f}%)')
-print(f'  Ann. Volatilitaet:  {ann_vol:.0f}%')
+print(f'  Ann. Volatilität:   {ann_vol:.0f}%')
 print(f'  Beta:               {beta}')
 print()
 print('⚠️ RISK SCORES')
@@ -141,11 +141,11 @@ print('📅 EARNINGS & EVENTS')
 try:
     cal = ticker.calendar
     if cal is not None and len(cal) > 0:
-        print(f'  Naechste Earnings:  {cal}')
+        print(f'  Nächste Earnings:   {cal}')
     else:
-        print('  Naechste Earnings:  Keine Daten verfuegbar')
+        print('  Nächste Earnings:   Keine Daten verfügbar')
 except:
-    print('  Naechste Earnings:  Keine Daten verfuegbar')
+    print('  Nächste Earnings:   Keine Daten verfügbar')
 ```
 
 **WICHTIG:**
@@ -242,32 +242,32 @@ Dokumentiere was du im Chart siehst:
 
 **Short-Interest-Einordnung:**
 - < 5%: Normal, kein besonderes Signal
-- 5-10%: Erhoehte Skepsis, beobachten
+- 5-10%: Erhöhte Skepsis, beobachten
 - 10-20%: Hohes Short Interest, Short-Squeeze-Potential bei positiven Katalysatoren
-- \> 20%: Extrem hoch, starkes Squeeze-Potential ABER auch starke bearishe Ueberzeugung
-- Short Ratio > 5 Tage: Shorts koennen nicht schnell covern -> Squeeze-Risiko steigt
+- \> 20%: Extrem hoch, starkes Squeeze-Potential ABER auch starke bearishe Überzeugung
+- Short Ratio > 5 Tage: Shorts können nicht schnell covern -> Squeeze-Risiko steigt
 
-> **Hoher Short Interest ist KEIN automatisches Kaufsignal!** Er zeigt Skepsis, kann aber bei Katalysatoren (Earnings Beat, News) explosive Moves ausloesen.
+> **Hoher Short Interest ist KEIN automatisches Kaufsignal!** Er zeigt Skepsis, kann aber bei Katalysatoren (Earnings Beat, News) explosive Moves auslösen.
 
 ---
 
-## 1.6 Volatilitaet & Risiko-Profil
+## 1.6 Volatilität & Risiko-Profil
 
 | Datenpunkt | Wert | Bedeutung |
 |------------|------|-----------|
 | ATR (14) | $XX.XX (X.X%) | Durchschnittliche Tagesschwankung |
-| Ann. Volatilitaet | XX% | Jahres-Volatilitaet |
-| Beta | X.XX | Markt-Sensitivitaet |
+| Ann. Volatilität | XX% | Jahres-Volatilität |
+| Beta | X.XX | Markt-Sensitivität |
 
-ATR wird in Schritt 3 fuer die KO-Berechnung genutzt. Hier nur den Wert dokumentieren.
+ATR wird in Schritt 3 für die KO-Berechnung genutzt. Hier nur den Wert dokumentieren.
 
-**Volatilitaets-Einordnung:**
+**Volatilitäts-Einordnung:**
 
-| ATR % | Einordnung | Bedeutung fuer Turbos |
+| ATR % | Einordnung | Bedeutung für Turbos |
 |-------|------------|----------------------|
-| < 2% | Niedrig | Enger KO moeglich, aber wenig Bewegung |
+| < 2% | Niedrig | Enger KO möglich, aber wenig Bewegung |
 | 2-4% | Mittel | Standard-Turbos gut geeignet |
-| 4-7% | Hoch | Weiter KO noetig, hoeheres Risiko |
+| 4-7% | Hoch | Weiter KO nötig, höheres Risiko |
 | > 7% | Sehr hoch | Nur mit kleiner Position, weiter KO PFLICHT |
 
 ---
@@ -325,8 +325,8 @@ Suchquellen:
 
 ```
 ╔═══════════════════════════════════════════════════════════════╗
-║  BEVOR ein neuer Trade eroeffnet wird:                       ║
-║  Pruefe Korrelation zu bestehenden Positionen!               ║
+║  BEVOR ein neuer Trade eröffnet wird:                        ║
+║  Prüfe Korrelation zu bestehenden Positionen!                ║
 ║                                                               ║
 ║  → Lies offene Positionen aus Supabase `portfolio` Tabelle   ║
 ║  → Bestimme Sektor-Konzentration                             ║
@@ -336,28 +336,28 @@ Suchquellen:
 
 **Bestehende offene Positionen (aus Supabase):**
 
-| Symbol | Sektor | Richtung | Groesse (EUR) |
+| Symbol | Sektor | Richtung | Größe (EUR) |
 |--------|--------|----------|---------------|
 | [aus DB] | [Sektor] | LONG/SHORT | XXX EUR |
 | [aus DB] | [Sektor] | LONG/SHORT | XXX EUR |
 
 **Korrelations-Bewertung:**
 
-| Pruefung | Ergebnis | Status |
-|----------|----------|--------|
+| Prüfung | Ergebnis | Status |
+|---------|----------|--------|
 | Gleicher Sektor wie {{SYMBOL}}? | [Ja/Nein - welche?] | ✅/⚠️ |
 | Gleiche Richtung (alle LONG)? | [Ja/Nein] | ✅/⚠️ |
 | Sektor-Konzentration | XX% in [Sektor] | ✅ <60% / ⚠️ >60% |
 | Korreliert mit Nasdaq/S&P? | [Hoch/Mittel/Niedrig] | ✅/⚠️ |
 
 **Wenn ⚠️ WARNUNG:**
-> Hohe Korrelation erkannt! Bei einem Nasdaq-Einbruch von 3% wuerden ALLE Positionen gleichzeitig bluten. Erwaege: kleinere Positionsgroesse, SHORT-Hedge, oder unkorrelierten Trade (Gold, Short-Turbo auf Index).
+> Hohe Korrelation erkannt! Bei einem Nasdaq-Einbruch von 3% würden ALLE Positionen gleichzeitig bluten. Erwäge: kleinere Positionsgröße, SHORT-Hedge, oder unkorrelierten Trade (Gold, Short-Turbo auf Index).
 
 ---
 
 ## 1.11 EVENT-KALENDER
 
-**Kommende Events die {{SYMBOL}} bewegen koennten:**
+**Kommende Events die {{SYMBOL}} bewegen könnten:**
 
 | Datum | Event | Erwarteter Impact | Relevanz |
 |-------|-------|-------------------|----------|
@@ -367,16 +367,16 @@ Suchquellen:
 | [Datum] | Earnings [Peer] | 🟡 Niedrig-Mittel | Sektor |
 | [Datum] | [Anderes Event] | [Impact] | [Relevanz] |
 
-**⚠️ EARNINGS-WARNUNG:** Wenn {{SYMBOL}} Earnings < 5 Handelstage entfernt sind, wird dies in Schritt 3 bei der KO-Berechnung beruecksichtigt (erhoehter ATR-Multiplikator).
+**⚠️ EARNINGS-WARNUNG:** Wenn {{SYMBOL}} Earnings < 5 Handelstage entfernt sind, wird dies in Schritt 3 bei der KO-Berechnung berücksichtigt (erhöhter ATR-Multiplikator).
 
 ---
 
 ## ENFORCEMENT
 
-- ✅ yfinance IMMER zuerst ausfuehren
+- ✅ yfinance IMMER zuerst ausführen
 - ✅ Chart generieren und visuell analysieren
 - ✅ Chart-Analyse-Tabelle ist PFLICHT
-- ✅ Keine Web-Suche fuer Preisdaten
+- ✅ Keine Web-Suche für Preisdaten
 - ✅ Jeder Datenpunkt mit Quelle
 - ✅ Mindestens 5 News-Headlines mit Datum
 - ✅ Korrelations-Check gegen bestehende Positionen (PFLICHT!)

@@ -185,7 +185,7 @@
 
 ```
 ╔═══════════════════════════════════════════════════════════════╗
-║  PFLICHT: Bewerte ob ein SHORT-Trade attraktiver waere!      ║
+║  PFLICHT: Bewerte ob ein SHORT-Trade attraktiver wäre!       ║
 ║                                                               ║
 ║  Das System darf NICHT nur LONG-Signale produzieren.         ║
 ║  Geld verdienen geht in beide Richtungen.                    ║
@@ -217,12 +217,12 @@ Differenz:   XX Punkte zugunsten [LONG/SHORT]
 **Wenn SHORT Score > LONG Score ODER Differenz < 5 Punkte:**
 > Erarbeite ein konkretes SHORT-Setup:
 > - SHORT Entry: $XX.XX (welches Resistance-Level?)
-> - SHORT KO: $XX.XX (ueber welchem Widerstand?)
+> - SHORT KO: $XX.XX (über welchem Widerstand?)
 > - SHORT Target: $XX.XX (welcher Support?)
-> - Warum SHORT hier besser ist: [2-3 Saetze]
+> - Warum SHORT hier besser ist: [2-3 Sätze]
 
 **Wenn LONG klar besser (Differenz > 10 Punkte):**
-> LONG bestaetigt. Weiter mit Schritt 3 als LONG-Trade.
+> LONG bestätigt. Weiter mit Schritt 3 als LONG-Trade.
 
 **Wenn unklar (Differenz 5-10 Punkte):**
 > Beide Setups in Schritt 3 ausarbeiten. Judge entscheidet.
@@ -235,13 +235,13 @@ Differenz:   XX Punkte zugunsten [LONG/SHORT]
 
 ## ENFORCEMENT
 
-- ✅ Minimum 4-6 Saetze pro Argument mit konkreten Zahlen
+- ✅ Minimum 4-6 Sätze pro Argument mit konkreten Zahlen
 - ✅ Jeder Analyst MUSS den Chart referenzieren
 - ✅ Bear MUSS Bull-Argumente explizit widerlegen
-- ✅ Kursziel mit Begruendung (Chart-Level referenzieren)
-- ✅ 2 vollstaendige Runden durchgefuehrt
+- ✅ Kursziel mit Begründung (Chart-Level referenzieren)
+- ✅ 2 vollständige Runden durchgeführt
 - ✅ Keine generischen Aussagen - nur konkrete Daten
-- ✅ SHORT-Trade Scorecard ausgefuellt
+- ✅ SHORT-Trade Scorecard ausgefüllt
 - ✅ SHORT-Setup ausgearbeitet wenn Score es verlangt
 
 ```

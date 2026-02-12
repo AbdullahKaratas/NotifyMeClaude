@@ -27,7 +27,7 @@ Each user runs their own independent instance: own Telegram bot, own Supabase DB
 ║  1. Max. Verlust pro Trade:      10% des Portfolios          ║
 ║  2. Max. gleichzeitig riskiert:  40% des Portfolios          ║
 ║  3. Max. Sektor-Konzentration:   60% in einem Sektor         ║
-║  4. Nach 2 Verlusten in Folge:   Positionsgroesse halbieren  ║
+║  4. Nach 2 Verlusten in Folge:   Positionsgröße halbieren    ║
 ║  5. Nach -20% Drawdown:          24h Trading-Pause           ║
 ║                                                               ║
 ║  Credentials NIEMALS in committed Files!                     ║
@@ -37,20 +37,33 @@ Each user runs their own independent instance: own Telegram bot, own Supabase DB
 
 ### Analyse-Prinzipien
 
-Die konkreten Trading-Entscheidungen (Entry, Exit, Stop, KO-Abstand) kommen aus der 4-Schritt-Analyse - nicht aus festen Regeln. Die Analyse liefert Support/Resistance, Konfidenz und Positionsgroesse pro Trade.
+Die konkreten Trading-Entscheidungen (Entry, Exit, Stop, KO-Abstand) kommen aus der 4-Schritt-Analyse - nicht aus festen Regeln. Die Analyse liefert Support/Resistance, Konfidenz und Positionsgröße pro Trade.
 
 **Kernprinzipien:**
 - **Gewinne mitnehmen** wenn die Analyse es zeigt (D-Wave Lektion: waren +30% im Plus, nicht mitgenommen)
 - **LONG und SHORT sind gleichwertig** - die Analyse entscheidet die Richtung, nicht ein Bias
-- **KO-Berechnung: ATR + Chart kombiniert** - KO liegt IMMER unter dem staerksten Support (LONG) bzw. ueber Resistance (SHORT). ATR-Multiplikator nach Asset-Klasse (Large Cap 2x, Small Cap 2.5x, Rohstoffe 3x)
+- **KO-Berechnung: ATR + Chart kombiniert** - KO liegt IMMER unter dem stärksten Support (LONG) bzw. über Resistance (SHORT). ATR-Multiplikator nach Asset-Klasse (Large Cap 2x, Small Cap 2.5x, Rohstoffe 3x)
 - **Time-Stops einhalten** - nach 5 Tagen ohne Bewegung halbieren, nach 8 Tagen raus
-- **Korrelation pruefen** - vor jedem neuen Trade Sektor-Konzentration checken
-- **Vor Earnings absichern** - min. 50% der Position vor dem Event sichern oder ATR-Multiplikator erhoehen
-- **Keine festen EUR-Betraege** - Positionsgroesse in % vom Portfolio (skaliert automatisch)
+- **Korrelation prüfen** - vor jedem neuen Trade Sektor-Konzentration checken
+- **Vor Earnings absichern** - min. 50% der Position vor dem Event sichern oder ATR-Multiplikator erhöhen
+- **Keine festen EUR-Beträge** - Positionsgröße in % vom Portfolio (skaliert automatisch)
+
+### Harte Regeln für Analysen
+
+Diese Regeln werden VOR dem Versand jeder Analyse geprüft:
+
+1. **Supabase zuerst** - Portfolio-Stand aus DB lesen, BEVOR Schritt 1 beginnt
+2. **yfinance = Wahrheit** - Kein Preis, ATR, RSI ohne yfinance-Quelle
+3. **Stop-Loss Pflicht** - Jeder Trade braucht einen Stop (mental oder TR)
+4. **KO nie erfinden** - KO kommt aus ATR + Chart, nie geschätzt
+5. **SHORT = LONG** - Scorecard muss ausgefüllt sein, SHORT-Setup bei Score >= LONG
+6. **Keine hardcodierten Wechselkurse** - EUR/USD immer live aus yfinance
+7. **Positions-% statt EUR** - Empfehlungen immer in % vom Portfolio
+8. **Korrelations-Check** - Sektor-Konzentration gegen 60%-Limit prüfen
 
 ### Aktueller Stand
 Portfolio (offene/geschlossene Positionen, Cash) lebt in der Supabase `portfolio` Tabelle.
-Analysen in `reminders`, Watchlist in `stocks`. Kein lokales State-File noetig.
+Analysen in `reminders`, Watchlist in `stocks`. Kein lokales State-File nötig.
 
 ---
 
@@ -110,7 +123,7 @@ Language defaults to German. Change `{{LANGUAGE}}` in `prompts/00_master.md` for
 - **KO = Maximum aus ATR-basiert und Chart-basiert** (immer das weiter entfernte Level)
 - **ATR-Multiplikator nach Asset-Klasse:** Large Cap 2.0x, Small/Mid Cap 2.5x, Rohstoffe 3.0x, Krypto 3.0x
 - **SHORT-Trades werden gleichwertig bewertet** via LONG vs SHORT Scorecard in Schritt 2
-- Position sizing in % vom Portfolio (5% Lotto / 15% Klein / 30% Standard / 20% Ohne Hebel)
+- Position sizing in % vom Portfolio (5% Mini / 15% Klein / 30% Standard / 20% Ohne Hebel)
 - Risk-per-trade capped at 10% Portfolio
 - Time-stops: 5 Tage ohne Bewegung → halbieren, 8 Tage → raus
 - Correlation check against open positions before each new trade
@@ -155,6 +168,19 @@ CHART_OUTPUT_DIR=...        # Optional: path to chart output directory
 
 **`supabase_client.py`** - Shared Supabase client module. Loads `.env` and provides `supabase_request()`.
 
+## Morning Screener
+
+**`morning_screener.py`** - Pre-market screener that scans S&P 500 + custom watchlist + futures before market open.
+- **Two-phase:** Fast batch `yf.download()` for ~500 symbols, then individual enrichment for top candidates only
+- Hard gates: price exists, RSI calculable, volume >= 100k (futures bypass volume/market-cap gates)
+- Scoring (0-100) for LONG and SHORT independently: RSI (20), SMA200 trend (15), SMA50 pullback/rejection (15), MACD crossover (15), ATR% volatility (20), analyst rating (10), bonus (5)
+- ATR% weighted highest (Turbo leverage needs volatility)
+- S&P 500 list fetched from Wikipedia, merged with Supabase watchlist
+- SI=F and GC=F always included (futures bypass hard gates)
+- Portfolio sector concentration check (60% limit)
+- Marks already-owned stocks, flags upcoming earnings
+- Workflow: `.github/workflows/morning_screener.yml` (08:00 CET, weekdays, 10 min timeout)
+
 ## Stock Watchlist
 
 Curated watchlist in Supabase `stocks` table, updated automatically via GitHub Actions.
@@ -182,6 +208,7 @@ Curated watchlist in Supabase `stocks` table, updated automatically via GitHub A
 | Stock Updater | `update_stocks.yml` | Every 30 min (market hours) | Update prices, RSI, SMAs |
 | Price Tracker | `tracker.yml` | Every 10 min (market hours) | Price alerts via Telegram |
 | Portfolio Check | `portfolio_check.yml` | 3x daily (08:00, 15:00, 21:00 CET) | RSI alerts, stop/KO proximity |
+| Morning Screener | `morning_screener.yml` | 08:00 CET (weekdays) | LONG/SHORT scoring, top picks |
 
 Secrets needed: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`
 
