@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Silver Hawk Trading - Morning Screener v3.
-Scans S&P 500 + custom watchlist + futures before market open.
+Scans NASDAQ-100 + custom watchlist + futures before market open.
 Scores LONG and SHORT independently with RSI delta, divergence, ADX,
 directional volume, Bollinger squeeze, and wrong-side penalties.
 Two-phase: fast batch yf.download(), then individual enrichment for top picks.
@@ -26,16 +26,16 @@ SECTOR_LIMIT = 0.60
 
 # ── Data Sources ──
 
-def fetch_sp500_symbols():
-    """Fetch S&P 500 constituents + GICS sectors from Wikipedia."""
+def fetch_nasdaq100_symbols():
+    """Fetch NASDAQ-100 constituents + ICB sectors from Wikipedia."""
     try:
-        url = 'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies'
+        url = 'https://en.wikipedia.org/wiki/Nasdaq-100'
         req = urllib.request.Request(url, headers={'User-Agent': 'SilverHawk/1.0'})
         resp = urllib.request.urlopen(req, timeout=20)
         html = resp.read().decode()
         parts = html.split('id="constituents"')
         if len(parts) < 2:
-            print('  Wikipedia: constituents table not found')
+            print('  Wikipedia: NASDAQ-100 constituents table not found')
             return [], {}
         table_html = parts[1].split('</table>')[0]
         rows = re.findall(r'<tr>(.*?)</tr>', table_html, re.DOTALL)
@@ -43,13 +43,12 @@ def fetch_sp500_symbols():
         sectors = {}
         for row in rows:
             cells = re.findall(r'<td[^>]*>(.*?)</td>', row, re.DOTALL)
-            if len(cells) >= 4:
-                ticker_match = re.search(r'>([A-Z][A-Z0-9.]{0,5})<', cells[0])
-                if ticker_match:
-                    raw = ticker_match.group(1)
-                    ticker = raw.replace('.', '-')
+            if len(cells) >= 3:
+                # Columns: [0]=Ticker, [1]=Company, [2]=ICB Industry, [3]=ICB Subsector
+                ticker = re.sub(r'<[^>]+>', '', cells[0]).strip().replace('.', '-')
+                if ticker and re.match(r'^[A-Z][A-Z0-9-]{0,5}$', ticker):
                     tickers.append(ticker)
-                    sector_text = re.sub(r'<[^>]+>', '', cells[3]).strip()
+                    sector_text = re.sub(r'<[^>]+>', '', cells[2]).strip()
                     if sector_text:
                         sectors[ticker] = sector_text
         return tickers, sectors
@@ -238,6 +237,16 @@ def calc_technicals(batch_data, symbols, single=False):
             # RSI Divergence
             rsi_divergence = detect_rsi_divergence(close.values, rsi_series.values)
 
+            # RSI Range Quality (last 20 days)
+            rsi_range = None
+            rsi_had_extreme = False
+            if len(rsi_clean) >= 20:
+                rsi_20 = rsi_clean.iloc[-20:]
+                rsi_20_vals = rsi_20[~np.isnan(rsi_20.values)]
+                if len(rsi_20_vals) >= 10:
+                    rsi_range = round(float(rsi_20_vals.max() - rsi_20_vals.min()), 1)
+                    rsi_had_extreme = bool((rsi_20_vals < 35).any() or (rsi_20_vals > 65).any())
+
             # ── MACD + histogram direction ──
             macd_cur = macd_prev = None
             macd_hist_dir = None
@@ -305,6 +314,7 @@ def calc_technicals(batch_data, symbols, single=False):
                 'price': price, 'change_pct': change_pct,
                 # RSI
                 'rsi': rsi, 'rsi_delta': rsi_delta, 'rsi_divergence': rsi_divergence,
+                'rsi_range': rsi_range, 'rsi_had_extreme': rsi_had_extreme,
                 # MACD
                 'macd_hist': macd_cur, 'macd_hist_prev': macd_prev,
                 'macd_hist_direction': macd_hist_dir, 'macd_converging': macd_converging,
@@ -369,6 +379,11 @@ def passes_hard_gates(sym, d):
     if sym in FUTURES:
         return True
     if (d.get('volume') or 0) < MIN_VOLUME:
+        return False
+    # RSI Range Quality: must oscillate (range >= 15) AND hit an extreme in 20 days
+    rsi_range = d.get('rsi_range')
+    rsi_had_extreme = d.get('rsi_had_extreme', False)
+    if rsi_range is not None and (rsi_range < 15 or not rsi_had_extreme):
         return False
     return True
 
@@ -860,9 +875,9 @@ def main():
     print(f'[{now.strftime("%H:%M:%S")} UTC] Morning Screener v3')
 
     # 1. Build symbol universe
-    print('  Fetching S&P 500 list...')
-    sp500, sp500_sectors = fetch_sp500_symbols()
-    print(f'  S&P 500: {len(sp500)} symbols')
+    print('  Fetching NASDAQ-100 list...')
+    ndx100, ndx100_sectors = fetch_nasdaq100_symbols()
+    print(f'  NASDAQ-100: {len(ndx100)} symbols')
 
     watchlist = get_watchlist()
     positions = get_open_positions()
@@ -870,7 +885,7 @@ def main():
 
     watchlist_syms = {s['symbol'] for s in watchlist}
     position_syms = {p['symbol'] for p in positions}
-    all_symbols = sorted(set(sp500) | watchlist_syms | position_syms | FUTURES)
+    all_symbols = sorted(set(ndx100) | watchlist_syms | position_syms | FUTURES)
     total_scanned = len(all_symbols)
     print(f'  Total universe: {total_scanned} symbols')
 
@@ -879,7 +894,7 @@ def main():
         return
 
     # Sector map: Wikipedia > watchlist (portfolio has no sector column)
-    sector_map = dict(sp500_sectors)
+    sector_map = dict(ndx100_sectors)
     for s in watchlist:
         sector_map.setdefault(s['symbol'], s.get('sector', 'Unbekannt'))
     # Futures get manual sector assignment
