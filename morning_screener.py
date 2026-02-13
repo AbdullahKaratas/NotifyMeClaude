@@ -27,7 +27,7 @@ SECTOR_LIMIT = 0.60
 # ── Data Sources ──
 
 def fetch_nasdaq100_symbols():
-    """Fetch NASDAQ-100 constituents + ICB sectors from Wikipedia."""
+    """Fetch NASDAQ-100 constituents + ICB sectors + company names from Wikipedia."""
     try:
         url = 'https://en.wikipedia.org/wiki/Nasdaq-100'
         req = urllib.request.Request(url, headers={'User-Agent': 'SilverHawk/1.0'})
@@ -36,11 +36,12 @@ def fetch_nasdaq100_symbols():
         parts = html.split('id="constituents"')
         if len(parts) < 2:
             print('  Wikipedia: NASDAQ-100 constituents table not found')
-            return [], {}
+            return [], {}, {}
         table_html = parts[1].split('</table>')[0]
         rows = re.findall(r'<tr>(.*?)</tr>', table_html, re.DOTALL)
         tickers = []
         sectors = {}
+        names = {}
         for row in rows:
             cells = re.findall(r'<td[^>]*>(.*?)</td>', row, re.DOTALL)
             if len(cells) >= 3:
@@ -48,13 +49,16 @@ def fetch_nasdaq100_symbols():
                 ticker = re.sub(r'<[^>]+>', '', cells[0]).strip().replace('.', '-')
                 if ticker and re.match(r'^[A-Z][A-Z0-9-]{0,5}$', ticker):
                     tickers.append(ticker)
+                    name_text = re.sub(r'<[^>]+>', '', cells[1]).strip()
+                    if name_text:
+                        names[ticker] = name_text
                     sector_text = re.sub(r'<[^>]+>', '', cells[2]).strip()
                     if sector_text:
                         sectors[ticker] = sector_text
-        return tickers, sectors
+        return tickers, sectors, names
     except Exception as e:
         print(f'  Wikipedia fetch failed: {e}')
-        return [], {}
+        return [], {}, {}
 
 
 def get_watchlist():
@@ -726,10 +730,11 @@ def calc_sector_concentration(positions, sector_map):
 
 # ── Message ──
 
-def fmt_candidate(i, score, sym, sector, d, signals, direction, pos_dirs):
+def fmt_candidate(i, score, sym, sector, d, signals, direction, pos_dirs, name=''):
     """Format a single candidate line for Telegram."""
     emoji = '🟢' if direction == 'LONG' else '🔴'
-    line = f'{emoji} {i}. <b>{sym}</b> ({sector}) {score}/100'
+    name_str = f' {name}' if name else ''
+    line = f'{emoji} {i}. <b>{sym}</b>{name_str} ({sector}) {score}/100'
 
     if sym in pos_dirs:
         pd = pos_dirs[sym]
@@ -779,8 +784,9 @@ def fmt_candidate(i, score, sym, sector, d, signals, direction, pos_dirs):
     return line
 
 
-def build_message(all_data, positions, sector_map, scan_time, total_scanned, pos_dirs):
+def build_message(all_data, positions, sector_map, scan_time, total_scanned, pos_dirs, name_map=None):
     """Build the Telegram screener message."""
+    name_map = name_map or {}
     passed = {sym: d for sym, d in all_data.items() if passes_hard_gates(sym, d)}
 
     long_scores = []
@@ -813,7 +819,7 @@ def build_message(all_data, positions, sector_map, scan_time, total_scanned, pos
         for i, (sc, sym, sec, d, sig) in enumerate(top_long, 1):
             if sc < MIN_SCORE:
                 break
-            msg += fmt_candidate(i, sc, sym, sec, d, sig, 'LONG', pos_dirs)
+            msg += fmt_candidate(i, sc, sym, sec, d, sig, 'LONG', pos_dirs, name_map.get(sym, ''))
     else:
         msg += '  Keine starken Setups\n'
 
@@ -822,7 +828,7 @@ def build_message(all_data, positions, sector_map, scan_time, total_scanned, pos
         for i, (sc, sym, sec, d, sig) in enumerate(top_short, 1):
             if sc < MIN_SCORE:
                 break
-            msg += fmt_candidate(i, sc, sym, sec, d, sig, 'SHORT', pos_dirs)
+            msg += fmt_candidate(i, sc, sym, sec, d, sig, 'SHORT', pos_dirs, name_map.get(sym, ''))
     else:
         msg += '  Keine starken Setups\n'
 
@@ -876,7 +882,7 @@ def main():
 
     # 1. Build symbol universe
     print('  Fetching NASDAQ-100 list...')
-    ndx100, ndx100_sectors = fetch_nasdaq100_symbols()
+    ndx100, ndx100_sectors, ndx100_names = fetch_nasdaq100_symbols()
     print(f'  NASDAQ-100: {len(ndx100)} symbols')
 
     watchlist = get_watchlist()
@@ -897,6 +903,11 @@ def main():
     sector_map = dict(ndx100_sectors)
     for s in watchlist:
         sector_map.setdefault(s['symbol'], s.get('sector', 'Unbekannt'))
+
+    # Name map: Wikipedia > watchlist
+    name_map = dict(ndx100_names)
+    for s in watchlist:
+        name_map.setdefault(s['symbol'], s.get('name', s['symbol']))
     # Futures get manual sector assignment
     sector_map.setdefault('SI=F', 'Commodities')
     sector_map.setdefault('GC=F', 'Commodities')
@@ -940,7 +951,7 @@ def main():
             sector_map.setdefault(sym, data[sym]['sector'])
 
     # 5. Build and send
-    msg = build_message(data, positions, sector_map, scan_time, total_scanned, pos_dirs)
+    msg = build_message(data, positions, sector_map, scan_time, total_scanned, pos_dirs, name_map)
     print(f'\n{msg}\n')
 
     result = send_telegram(msg)
